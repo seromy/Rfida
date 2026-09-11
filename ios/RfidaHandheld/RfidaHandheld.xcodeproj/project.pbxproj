@@ -36,6 +36,7 @@
 		785A8DC025DB336F21ADEE89 /* MultiTagWarningView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DD49E5415E2CBA12B428BF0 /* MultiTagWarningView.swift */; };
 		D3985A19D75C95C5E49C5376 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB23538ECA6E287AA7437368 /* Constants.swift */; };
 		113ABCB25E6195CD9797AF6D /* Bundle+Version.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3091895DE9F8B7EE94EFD56D /* Bundle+Version.swift */; };
+		115DE7AF4CC65754168D830D /* ScanSoundPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7A6EE6214F4F4C1C059843E /* ScanSoundPlayer.swift */; };
 		3CF281539EA7DBCF3AB4FB8A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9DCA121B40CA436A76F5791A /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
@@ -69,6 +70,7 @@
 		5DD49E5415E2CBA12B428BF0 /* MultiTagWarningView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiTagWarningView.swift; sourceTree = "<group>"; };
 		AB23538ECA6E287AA7437368 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		3091895DE9F8B7EE94EFD56D /* Bundle+Version.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bundle+Version.swift; sourceTree = "<group>"; };
+		B7A6EE6214F4F4C1C059843E /* ScanSoundPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanSoundPlayer.swift; sourceTree = "<group>"; };
 		9DCA121B40CA436A76F5791A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E59939D32FD9EF98DC6098D4 /* RfidaHandheld.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RfidaHandheld.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -196,6 +198,7 @@
 			children = (
 				AB23538ECA6E287AA7437368 /* Constants.swift */,
 				3091895DE9F8B7EE94EFD56D /* Bundle+Version.swift */,
+				B7A6EE6214F4F4C1C059843E /* ScanSoundPlayer.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -307,6 +310,7 @@
 				785A8DC025DB336F21ADEE89 /* MultiTagWarningView.swift in Sources */,
 				D3985A19D75C95C5E49C5376 /* Constants.swift in Sources */,
 				113ABCB25E6195CD9797AF6D /* Bundle+Version.swift in Sources */,
+				115DE7AF4CC65754168D830D /* ScanSoundPlayer.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -18,6 +18,7 @@ final class CheckoutViewModel: ObservableObject {
         for read in reads where !seen.contains(read.epc) {
             seen.insert(read.epc)
             scannedEPCs.append(read.epc)
+            ScanSoundPlayer.shared.playScanBeep()
         }
     }
 

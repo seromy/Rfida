@@ -19,7 +19,12 @@ final class InventoryViewModel: ObservableObject {
     var isNearBufferLimit: Bool { scannedEPCs.count >= Self.tagBufferWarningThreshold }
 
     func handle(reads: [TagRead]) {
-        for read in reads { scannedEPCs.insert(read.epc) }
+        for read in reads {
+            let (inserted, _) = scannedEPCs.insert(read.epc)
+            if inserted {
+                ScanSoundPlayer.shared.playScanBeep()
+            }
+        }
     }
 
     func notSeen(in masterData: MasterDataStore) -> [Equipment] {

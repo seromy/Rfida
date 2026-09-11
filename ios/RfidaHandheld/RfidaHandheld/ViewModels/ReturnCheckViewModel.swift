@@ -42,7 +42,10 @@ final class ReturnCheckViewModel: ObservableObject {
 
     func handle(reads: [TagRead]) {
         for read in reads {
-            scannedEPCs.insert(read.epc)
+            let (inserted, _) = scannedEPCs.insert(read.epc)
+            if inserted {
+                ScanSoundPlayer.shared.playScanBeep()
+            }
         }
     }
 
