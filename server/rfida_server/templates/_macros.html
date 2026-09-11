@@ -1,0 +1,22 @@
+{% macro equipment_status_badge(status) %}
+  {% set labels = {'in_stock': '在庫', 'checked_out': '已出Job', 'missing': '遺失'} %}
+  <span class="badge badge-{{ status }}">{{ labels.get(status, status) }}</span>
+{% endmacro %}
+
+{% macro job_status_badge(status) %}
+  {% set labels = {'open': '進行中', 'closed': '已結束'} %}
+  <span class="badge badge-{{ status }}">{{ labels.get(status, status) }}</span>
+{% endmacro %}
+
+{% macro direction_badge(direction) %}
+  {% set labels = {'out': '出Job', 'in': '歸還'} %}
+  <span class="badge badge-{{ direction }}">{{ labels.get(direction, direction) }}</span>
+{% endmacro %}
+
+{% macro epc_list(epcs) %}
+  {% if epcs %}
+    {% for epc in epcs %}<span class="epc-chip">{{ epc }}</span>{% endfor %}
+  {% else %}
+    <span class="text-muted">—</span>
+  {% endif %}
+{% endmacro %}

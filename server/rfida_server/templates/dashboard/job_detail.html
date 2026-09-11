@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% import "_macros.html" as m %}
+{% block title %}{{ job.name }}{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <div>
+    <div class="eyebrow">Job 詳情</div>
+    <h1>{{ job.name }}</h1>
+    <p>{{ job.date.strftime('%Y-%m-%d') }} · {{ m.job_status_badge(job.status) }}</p>
+  </div>
+  <div>
+    {% if job.status == 'open' %}
+      <form method="post" action="{{ url_for('dashboard.job_close', job_id=job.id) }}">
+        <button class="btn" type="submit">結束呢個 Job</button>
+      </form>
+    {% else %}
+      <form method="post" action="{{ url_for('dashboard.job_reopen', job_id=job.id) }}">
+        <button class="btn btn-ghost" type="submit">重新開啟</button>
+      </form>
+    {% endif %}
+  </div>
+</div>
+
+<div class="grid-2">
+  <div class="card">
+    <h2>出入紀錄</h2>
+    {% if movements %}
+      <table>
+        <thead><tr><th>時間</th><th>員工</th><th>方向</th><th>EPC</th></tr></thead>
+        <tbody>
+          {% for mv in movements %}
+          <tr>
+            <td>{{ mv.created_at.strftime('%m/%d %H:%M') }}</td>
+            <td>{{ mv.staff.name if mv.staff else '—' }}</td>
+            <td>{{ m.direction_badge(mv.direction) }}</td>
+            <td>{{ m.epc_list(mv.epcs) }}</td>
+          </tr>
+          {% if mv.missing_epcs %}
+          <tr>
+            <td></td>
+            <td colspan="3"><span class="badge badge-missing">缺件</span> {{ m.epc_list(mv.missing_epcs) }}</td>
+          </tr>
+          {% endif %}
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <div class="empty-state">呢個 Job 未有出入紀錄</div>
+    {% endif %}
+  </div>
+
+  <div class="card">
+    <h3>出Job時帶走嘅器材(應有清單)</h3>
+    <p class="text-muted">供App「返office前清點」情景比對用。</p>
+    {% if expected_items %}
+      <ul class="list-plain">
+        {% for eq in expected_items %}
+          <li>{{ eq.name }} {{ m.equipment_status_badge(eq.status) }}</li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="text-muted">未有「出Job」紀錄</p>
+    {% endif %}
+  </div>
+</div>
+
+{% endblock %}

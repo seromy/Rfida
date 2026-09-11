@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% import "_macros.html" as m %}
+{% block title %}盤點紀錄{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <div>
+    <div class="eyebrow">定期盤點</div>
+    <h1>盤點紀錄</h1>
+    <p>App「情景4:定期盤點」提交嘅批次結果,「未知標籤」代表主檔未登記嘅EPC。</p>
+  </div>
+</div>
+
+<div class="card card-flush">
+  {% if items %}
+  <table>
+    <thead>
+      <tr><th>時間</th><th>批次</th><th>員工</th><th>掃描數量</th><th>未知標籤</th></tr>
+    </thead>
+    <tbody>
+      {% for s in items %}
+      <tr>
+        <td>{{ s.timestamp.strftime('%Y-%m-%d %H:%M') }}</td>
+        <td>{{ s.batch_label or '—' }}</td>
+        <td>{{ s.staff.name if s.staff else '—' }}</td>
+        <td>{{ (s.scanned_epcs or [])|length }}</td>
+        <td>
+          {% if s.unknown_epcs %}
+            <span class="badge badge-missing">{{ s.unknown_epcs|length }}</span>
+            {{ m.epc_list(s.unknown_epcs) }}
+          {% else %}
+            <span class="text-muted">—</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+    <div class="empty-state">未有盤點紀錄</div>
+  {% endif %}
+</div>
+
+{% endblock %}

@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% import "_macros.html" as m %}
+{% block title %}總覽{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <div>
+    <div class="eyebrow">總覽</div>
+    <h1>器材出入管理總覽</h1>
+    <p>即時掌握器材在庫、出Job同盤點狀況。</p>
+  </div>
+</div>
+
+<div class="stat-grid">
+  <div class="stat-card">
+    <div class="stat-value">{{ stats.total }}</div>
+    <div class="stat-label">器材總數</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-value">{{ stats.in_stock }}</div>
+    <div class="stat-label">在庫</div>
+  </div>
+  <div class="stat-card accent">
+    <div class="stat-value">{{ stats.checked_out }}</div>
+    <div class="stat-label">已出Job</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-value">{{ stats.missing }}</div>
+    <div class="stat-label">遺失</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-value">{{ stats.open_jobs }}</div>
+    <div class="stat-label">進行中 Job</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-value">{{ stats.staff }}</div>
+    <div class="stat-label">員工人數</div>
+  </div>
+</div>
+
+<div class="grid-2">
+  <div class="card">
+    <div class="section-title">
+      <h2>最近出入紀錄</h2>
+      <a href="{{ url_for('dashboard.movement_list') }}" class="text-muted">查看全部 →</a>
+    </div>
+    {% if recent_movements %}
+      <table>
+        <thead>
+          <tr><th>時間</th><th>Job</th><th>員工</th><th>方向</th><th>數量</th></tr>
+        </thead>
+        <tbody>
+          {% for mv in recent_movements %}
+          <tr>
+            <td>{{ mv.created_at.strftime('%m/%d %H:%M') }}</td>
+            <td>{{ mv.job.name if mv.job else '—' }}</td>
+            <td>{{ mv.staff.name if mv.staff else '—' }}</td>
+            <td>{{ m.direction_badge(mv.direction) }}</td>
+            <td>{{ (mv.epcs or [])|length }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <div class="empty-state">未有出入紀錄</div>
+    {% endif %}
+  </div>
+
+  <div>
+    <div class="card">
+      <div class="section-title">
+        <h3>進行中 Job</h3>
+        <a href="{{ url_for('dashboard.job_list') }}" class="text-muted">全部 →</a>
+      </div>
+      {% if open_jobs %}
+        <ul class="list-plain">
+          {% for job in open_jobs %}
+            <li><a href="{{ url_for('dashboard.job_detail', job_id=job.id) }}">{{ job.name }}</a></li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="text-muted">而家冇進行中嘅 Job</p>
+      {% endif %}
+    </div>
+
+    <div class="card">
+      <div class="section-title">
+        <h3>遺失器材</h3>
+        <a href="{{ url_for('dashboard.equipment_list', status='missing') }}" class="text-muted">全部 →</a>
+      </div>
+      {% if missing_equipment %}
+        <ul class="list-plain">
+          {% for eq in missing_equipment %}
+            <li>{{ eq.name }} <span class="text-muted mono">{{ eq.epc[-6:] }}</span></li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="text-muted">冇遺失器材,狀況良好</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% import "_macros.html" as m %}
+{% block title %}出入紀錄{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <div>
+    <div class="eyebrow">歷史紀錄</div>
+    <h1>出入紀錄</h1>
+    <p>App「出發前登記」同「返office前清點」提交嘅所有紀錄。</p>
+  </div>
+</div>
+
+<div class="card card-flush">
+  {% if items %}
+  <table>
+    <thead>
+      <tr><th>時間</th><th>Job</th><th>員工</th><th>方向</th><th>EPC</th><th>備註</th></tr>
+    </thead>
+    <tbody>
+      {% for mv in items %}
+      <tr>
+        <td>{{ mv.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+        <td>{% if mv.job %}<a href="{{ url_for('dashboard.job_detail', job_id=mv.job.id) }}">{{ mv.job.name }}</a>{% else %}—{% endif %}</td>
+        <td>{{ mv.staff.name if mv.staff else '—' }}</td>
+        <td>{{ m.direction_badge(mv.direction) }}</td>
+        <td>{{ m.epc_list(mv.epcs) }}
+          {% if mv.missing_epcs %}<br><span class="badge badge-missing">缺件</span> {{ m.epc_list(mv.missing_epcs) }}{% endif %}
+        </td>
+        <td class="text-muted">{{ mv.note or '—' }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+    <div class="empty-state">未有出入紀錄</div>
+  {% endif %}
+</div>
+
+{% endblock %}
