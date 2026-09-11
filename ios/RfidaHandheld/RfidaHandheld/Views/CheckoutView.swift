@@ -50,7 +50,7 @@ struct CheckoutView: View {
 
                 Section {
                     Button {
-                        Task { await viewModel.submit(masterData: masterData) }
+                        Task { await viewModel.submit() }
                     } label: {
                         if viewModel.isSubmitting { ProgressView() } else { Text("提交出Job紀錄") }
                     }

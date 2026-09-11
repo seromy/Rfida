@@ -5,7 +5,15 @@ import Foundation
 @MainActor
 final class ReturnCheckViewModel: ObservableObject {
     @Published var selectedStaffId: Int?
-    @Published var selectedJobId: Int?
+    /// 轉揀另一個Job時清空舊嘅應有清單同掃描結果,避免用戶漏撳「讀取應有清單」
+    /// 而將舊Job嘅比對結果誤當做新Job提交(核心功能7.4嘅正確性保障)。
+    @Published var selectedJobId: Int? {
+        didSet {
+            guard oldValue != selectedJobId else { return }
+            expectedItems = []
+            scannedEPCs.removeAll()
+        }
+    }
     @Published var expectedItems: [MovementItem] = []
     @Published var scannedEPCs: Set<String> = []
     @Published var isLoadingExpected = false

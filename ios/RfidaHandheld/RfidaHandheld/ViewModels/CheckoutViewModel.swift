@@ -31,7 +31,7 @@ final class CheckoutViewModel: ObservableObject {
         seen.removeAll()
     }
 
-    func submit(masterData: MasterDataStore) async {
+    func submit() async {
         guard let staffId = selectedStaffId else {
             lastError = "請先選擇員工"; return
         }

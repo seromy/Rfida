@@ -27,6 +27,11 @@ final class BLEManager: NSObject, ObservableObject {
     private var rxCharacteristic: CBCharacteristic?
     private var txCharacteristic: CBCharacteristic?
     private var parser = NUSFrameParser()
+    /// 記住使用者係咪想搵緊裝置。CBCentralManager啱啱建立時state係`.unknown`,
+    /// 要等藍牙權限彈窗有回應先會變成`.poweredOn`,所以App一開DeviceScanView就即刻
+    /// startScan()好可能會因為呢個時間差而靜默無效;呢個flag俾我哋喺state事後變成
+    /// `.poweredOn`嗰陣自動補做一次掃描,唔使使用者自己發現要撳多次「搜尋」。
+    private var wantsScanning = false
 
     override init() {
         super.init()
@@ -34,6 +39,7 @@ final class BLEManager: NSObject, ObservableObject {
     }
 
     func startScan() {
+        wantsScanning = true
         discoveredDevices.removeAll()
         guard central.state == .poweredOn else { return }
         state = .scanning
@@ -41,11 +47,13 @@ final class BLEManager: NSObject, ObservableObject {
     }
 
     func stopScan() {
+        wantsScanning = false
         central.stopScan()
         if state == .scanning { state = .disconnected }
     }
 
     func connect(_ device: BLEDevice) {
+        wantsScanning = false
         central.stopScan()
         state = .connecting
         central.connect(device.peripheral, options: nil)
@@ -75,6 +83,7 @@ extension BLEManager: CBCentralManagerDelegate {
         switch central.state {
         case .poweredOn:
             state = .disconnected
+            if wantsScanning { startScan() }
         case .unauthorized:
             state = .unauthorized
         default:
