@@ -1,6 +1,6 @@
 # iPhone App ↔ 後台伺服器 REST API 合約
 
-呢份文件定義 iOS App(`ios/RfidaHandheld`)期望嘅 Flask + SQLite 後台REST API。後台伺服器本身唔喺呢個repo嘅範圍(方案書標註「已有雛型」,屬獨立組件),App已經按照呢個合約實作 networking layer(`Networking/APIClient.swift`),後台開發時請對齊,或者按實際情況調整App入面嘅路徑。
+呢份文件定義 iOS App(`ios/RfidaHandheld`)期望嘅 Flask + SQLite 後台REST API。後台伺服器已按呢個合約實作喺 [`server/`](../server/)(見 [`server/README.md`](../server/README.md)),App已經按照呢個合約實作 networking layer(`Networking/APIClient.swift`)。如果實際實作有出入,對應調整 `server/` 或者App入面嘅路徑即可。
 
 方案書4.2:「業務邏輯(員工名單、Job名單、commit紀錄)一律經WiFi打去後台伺服器。」BLE只負責傳送EPC,所有資料查詢/提交都經呢度嘅API。
 
@@ -105,5 +105,5 @@ Base URL 喺App「設定」畫面設定(例:`http://192.168.1.50:5000`),所有�
 ## 尚未涵蓋(留返俾後台/日後擴充)
 
 - 冇登入/權限系統(方案書第9節明確假設信任網絡環境),所以以上API都冇auth header。
-- Job嘅建立/關閉(CRUD)未定義 —— 現時App假設Job清單由後台或其他管理介面維護,App淨係讀取 `status=open` 嘅Job。
+- Job嘅建立/關閉(CRUD)冇對外REST API —— App淨係讀取 `status=open` 嘅Job,Job清單改由 [`server/`](../server/) 嘅網頁Dashboard(`/jobs`)管理。
 - 多部手提機同時使用嘅中央同步架構(方案書第9節提及嘅擴展方向)未涵蓋。

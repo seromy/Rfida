@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}員工{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <div>
+    <div class="eyebrow">人員名單</div>
+    <h1>員工</h1>
+    <p>App內揀選「出Job/歸還/盤點」人員時使用嘅名單。</p>
+  </div>
+</div>
+
+<div class="card">
+  <h3>新增員工</h3>
+  <form method="post" action="{{ url_for('dashboard.staff_create') }}" class="form-inline">
+    <div class="field">
+      <label for="name">姓名</label>
+      <input type="text" id="name" name="name" placeholder="陳大文" required>
+    </div>
+    <button class="btn" type="submit">新增</button>
+  </form>
+</div>
+
+<div class="card card-flush">
+  {% if items %}
+  <table>
+    <thead><tr><th>姓名</th><th></th></tr></thead>
+    <tbody>
+      {% for s in items %}
+      <tr>
+        <td>{{ s.name }}</td>
+        <td style="text-align:right;">
+          <form method="post" action="{{ url_for('dashboard.staff_delete', staff_id=s.id) }}" onsubmit="return confirm('確定刪除「{{ s.name }}」?');">
+            <button class="btn btn-ghost btn-sm" type="submit">刪除</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+    <div class="empty-state">未有員工紀錄</div>
+  {% endif %}
+</div>
+
+{% endblock %}
