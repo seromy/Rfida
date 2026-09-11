@@ -41,14 +41,14 @@ ios/RfidaHandheld/
 
 四個情景每次成功掃描到「新」標籤(即之前未見過嘅EPC)都會發出一下短嗶聲(`Utilities/ScanSoundPlayer.swift`,即時合成、唔需要綁定音效檔案),提示聲唔跟手機側邊靜音撥掣,只受「設定」入面嘅靜音模式開關控制。
 
-## 對外介面(需要另外實作嘅組件)
+## 對外介面
 
-呢個App假設連接兩個依方案書設計、但唔喺呢個repo範圍內嘅組件:
+呢個App需要連接兩個依方案書設計嘅組件:
 
-- **ESP32韌體**(Arduino/C++,BLE Nordic UART Service模式):協議定義見 [`docs/BLE_PROTOCOL.md`](../docs/BLE_PROTOCOL.md)。
-- **Flask + SQLite 後台伺服器**(REST API + 網頁Dashboard):合約定義見 [`docs/API_CONTRACT.md`](../docs/API_CONTRACT.md)。
+- **ESP32韌體**(Arduino/C++,BLE Nordic UART Service模式,唔喺呢個repo範圍內):協議定義見 [`docs/BLE_PROTOCOL.md`](../docs/BLE_PROTOCOL.md)。
+- **Flask + SQLite 後台伺服器**(REST API + 網頁Dashboard,已包含喺呢個repo嘅 [`server/`](../server/)):合約定義見 [`docs/API_CONTRACT.md`](../docs/API_CONTRACT.md)。
 
-兩份文件已經按照App現有實作寫定,韌體/後台開發時可以直接對齊;如果實際實作有出入,對應調整 `BLE/NUSProtocol.swift` 或 `Networking/APIClient.swift` 即可。
+兩份文件已經按照App現有實作寫定;如果實際實作有出入,對應調整 `BLE/NUSProtocol.swift`、`Networking/APIClient.swift` 或 `server/` 即可。
 
 ## 已知限制(對應方案書第9節)
 

@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% import "_macros.html" as m %}
+{% block title %}Job{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <div>
+    <div class="eyebrow">工作排程</div>
+    <h1>Job 清單</h1>
+    <p>App 「出發前登記」畫面只會揀到進行中(open)嘅 Job。</p>
+  </div>
+</div>
+
+<div class="card">
+  <h3>建立新 Job</h3>
+  <form method="post" action="{{ url_for('dashboard.job_create') }}" class="form-inline">
+    <div class="field">
+      <label for="name">Job 名稱</label>
+      <input type="text" id="name" name="name" placeholder="2026-09-12 婚禮攝影" required>
+    </div>
+    <div class="field">
+      <label for="date">日期</label>
+      <input type="date" id="date" name="date">
+    </div>
+    <button class="btn" type="submit">建立</button>
+  </form>
+</div>
+
+<div class="card card-flush">
+  <div style="padding: 20px 20px 0;">
+    <div class="pill-nav">
+      <a href="{{ url_for('dashboard.job_list') }}" class="{{ 'active' if not status }}">全部</a>
+      <a href="{{ url_for('dashboard.job_list', status='open') }}" class="{{ 'active' if status == 'open' }}">進行中</a>
+      <a href="{{ url_for('dashboard.job_list', status='closed') }}" class="{{ 'active' if status == 'closed' }}">已結束</a>
+    </div>
+  </div>
+
+  {% if items %}
+  <table>
+    <thead><tr><th>Job</th><th>日期</th><th>狀態</th><th></th></tr></thead>
+    <tbody>
+      {% for job in items %}
+      <tr>
+        <td><a href="{{ url_for('dashboard.job_detail', job_id=job.id) }}">{{ job.name }}</a></td>
+        <td>{{ job.date.strftime('%Y-%m-%d') }}</td>
+        <td>{{ m.job_status_badge(job.status) }}</td>
+        <td style="text-align:right;"><a class="btn btn-ghost btn-sm" href="{{ url_for('dashboard.job_detail', job_id=job.id) }}">詳情</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+    <div class="empty-state">未有 Job 紀錄</div>
+  {% endif %}
+</div>
+
+{% endblock %}

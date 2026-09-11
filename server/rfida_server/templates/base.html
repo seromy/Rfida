@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{% block title %}Rfida{% endblock %} · Rfida 後台</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+</head>
+<body>
+  <nav class="topnav">
+    <div class="topnav-inner">
+      <a class="brand" href="{{ url_for('dashboard.index') }}">
+        <span class="brand-mark">R</span>
+        Rfida
+      </a>
+      <div class="nav-links">
+        <a href="{{ url_for('dashboard.index') }}" class="{{ 'active' if request.endpoint == 'dashboard.index' }}">總覽</a>
+        <a href="{{ url_for('dashboard.equipment_list') }}" class="{{ 'active' if request.endpoint == 'dashboard.equipment_list' }}">器材</a>
+        <a href="{{ url_for('dashboard.job_list') }}" class="{{ 'active' if request.endpoint in ['dashboard.job_list', 'dashboard.job_detail'] }}">Job</a>
+        <a href="{{ url_for('dashboard.movement_list') }}" class="{{ 'active' if request.endpoint == 'dashboard.movement_list' }}">出入紀錄</a>
+        <a href="{{ url_for('dashboard.inventory_session_list') }}" class="{{ 'active' if request.endpoint == 'dashboard.inventory_session_list' }}">盤點紀錄</a>
+        <a href="{{ url_for('dashboard.staff_list') }}" class="{{ 'active' if request.endpoint == 'dashboard.staff_list' }}">員工</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-wrap">
+          {% for category, message in messages %}
+            <div class="flash flash-{{ category }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+  </div>
+
+  <footer class="app-footer">Rfida 器材出入管理系統 — 內部後台</footer>
+</body>
+</html>
