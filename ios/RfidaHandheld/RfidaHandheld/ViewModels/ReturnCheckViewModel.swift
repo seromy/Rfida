@@ -5,18 +5,34 @@ import Foundation
 @MainActor
 final class ReturnCheckViewModel: ObservableObject {
     @Published var selectedStaffId: Int?
-    @Published var selectedJobId: Int?
+    /// 轉揀另一個Job時清空舊嘅應有清單同掃描結果,避免用戶漏撳「讀取應有清單」
+    /// 而將舊Job嘅比對結果誤當做新Job提交(核心功能7.4嘅正確性保障)。
+    @Published var selectedJobId: Int? {
+        didSet {
+            guard oldValue != selectedJobId else { return }
+            expectedItems = []
+            scannedEPCs.removeAll()
+            justCompleted = false
+        }
+    }
     @Published var expectedItems: [MovementItem] = []
     @Published var scannedEPCs: Set<String> = []
     @Published var isLoadingExpected = false
     @Published var isSubmitting = false
     @Published var lastMessage: String?
     @Published var lastError: String?
+    /// 揀齊晒(冇缺件)嗰一刻由true閃一閃,俾View觸發明顯嘅剔號動畫;
+    /// View睇完即刻set返false,下次先可以再觸發。
+    @Published var justCompleted = false
 
     private let api = APIClient.shared
 
     var diff: ReturnDiffResult {
         ReturnDiffEngine.diff(expected: expectedItems, scannedEPCs: scannedEPCs)
+    }
+
+    var isFullyMatched: Bool {
+        !expectedItems.isEmpty && diff.missing.isEmpty
     }
 
     func loadExpectedItems() async {
@@ -33,8 +49,21 @@ final class ReturnCheckViewModel: ObservableObject {
     }
 
     func handle(reads: [TagRead]) {
+        var completedJustNow = false
         for read in reads {
-            scannedEPCs.insert(read.epc)
+            let wasComplete = isFullyMatched
+            let (inserted, _) = scannedEPCs.insert(read.epc)
+            guard inserted else { continue }
+            if !wasComplete && isFullyMatched {
+                // 呢個標籤啱啱好補齊咗最後一件缺件,播特別嘅完成音代替普通嗶聲。
+                completedJustNow = true
+            } else {
+                ScanSoundPlayer.shared.playScanBeep()
+            }
+        }
+        if completedJustNow {
+            ScanSoundPlayer.shared.playAllClearChime()
+            justCompleted = true
         }
     }
 

@@ -5,6 +5,7 @@ struct ReturnCheckView: View {
     @EnvironmentObject var ble: BLEManager
     @EnvironmentObject var masterData: MasterDataStore
     @StateObject private var viewModel = ReturnCheckViewModel()
+    @State private var showCompletionTick = false
 
     var body: some View {
         NavigationStack {
@@ -84,6 +85,44 @@ struct ReturnCheckView: View {
                 ble.send(mode: .idle)
                 ble.onTagsRead = nil
             }
+            .overlay {
+                completionTickOverlay
+            }
+            .onChange(of: viewModel.justCompleted) { newValue in
+                guard newValue else { return }
+                withAnimation(.spring(response: 0.45, dampingFraction: 0.65)) {
+                    showCompletionTick = true
+                }
+                Task {
+                    try? await Task.sleep(nanoseconds: 1_400_000_000)
+                    withAnimation(.easeOut(duration: 0.3)) {
+                        showCompletionTick = false
+                    }
+                    viewModel.justCompleted = false
+                }
+            }
         }
+    }
+
+    /// 情景3掃齊晒(冇缺件)嗰下彈出嘅明顯剔號提示,配合特別完成音一齊出現。
+    private var completionTickOverlay: some View {
+        VStack(spacing: 14) {
+            ZStack {
+                Circle()
+                    .fill(Color.green)
+                    .frame(width: 100, height: 100)
+                Image(systemName: "checkmark")
+                    .font(.system(size: 52, weight: .bold))
+                    .foregroundStyle(.white)
+            }
+            Text("全部器材已歸還")
+                .font(.headline)
+        }
+        .padding(28)
+        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 24, style: .continuous))
+        .shadow(radius: 16)
+        .scaleEffect(showCompletionTick ? 1 : 0.4)
+        .opacity(showCompletionTick ? 1 : 0)
+        .allowsHitTesting(false)
     }
 }

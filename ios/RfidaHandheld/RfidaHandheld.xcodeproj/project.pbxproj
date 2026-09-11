@@ -7,69 +7,72 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		240487B519D571AB44043DAE /* RfidaHandheldApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D10F215C28C58630E4AB8FE /* RfidaHandheldApp.swift */; };
-		0E6700C464BC1CE4F17F24FA /* Equipment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56756B1CF51FF0A8EE93E3CD /* Equipment.swift */; };
-		ABB00CEC60DA37755834EB0C /* Staff.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4780815F7FDEC9460F56DC22 /* Staff.swift */; };
-		1827877FC68A91B0B34DA84F /* Job.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97059FD098DF0C5D7C44FE53 /* Job.swift */; };
-		DE88406920981DE5D3DAF778 /* MovementModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 230FD97B4F41BC8898BE3C41 /* MovementModels.swift */; };
-		743FCF8A61C79CBD7E5ED3D3 /* InventoryModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C255E0C50DE7CA06837305E /* InventoryModels.swift */; };
-		DD6F94B83FBDDD1D317AB1C9 /* TagRead.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE754ED90BE3FEA545644641 /* TagRead.swift */; };
-		B9579EA4A538D9305910F546 /* BLEDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 776971CE9652590BED9D8E9E /* BLEDevice.swift */; };
-		4B74DE75BE5B394DB28AA108 /* NUSProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4938B0BAA6C1D182E20BA4A /* NUSProtocol.swift */; };
-		45D0E508BB0B79A924C9AA6B /* BLEManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 329AAEC8F18EAA601AC2D699 /* BLEManager.swift */; };
-		A1A51301332352638DFC81BE /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C07CA46C06F1C1168C5771 /* APIClient.swift */; };
-		85A38DE02BB770D1A9A63697 /* MasterDataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B37D71068C76C527F5681A10 /* MasterDataStore.swift */; };
-		EC6C4195B2AD3152DF4B09CA /* ReturnDiffEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7838F671A603A3CB1786F85D /* ReturnDiffEngine.swift */; };
-		EFCCD609FDB08934E3710F8C /* RegisterTagViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4B61398DC67FB57B1CD76BA /* RegisterTagViewModel.swift */; };
-		DE7C858D0E4A05407B8A9EA7 /* CheckoutViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21BAC9AAD185EFE904092386 /* CheckoutViewModel.swift */; };
 		001F467CC525AAAC0C0108EB /* ReturnCheckViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02B720A3D1D7D02FA51E0D03 /* ReturnCheckViewModel.swift */; };
 		0724E1A3B9F25C2A1FA0AB6C /* InventoryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D9A55B22D60150F2D73621F /* InventoryViewModel.swift */; };
-		DAC35DEBF841B7D4773F318B /* RootTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA786609EAFA0D0364DE5C92 /* RootTabView.swift */; };
-		EED711E8AF538B0BFEC0F197 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 751FC6CE3D28C8034716057E /* HomeView.swift */; };
-		32E04E6A3BFFF62E03514A12 /* DeviceScanView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2FEB388DAE1072A47E440C2 /* DeviceScanView.swift */; };
-		FC822AA557C9D4379A59A7A0 /* RegisterTagView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB23CF4C209C70213D20B738 /* RegisterTagView.swift */; };
-		A5547A6D37D372F30026A07A /* CheckoutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7BE7F6F8EE0A83E0F5DFA64 /* CheckoutView.swift */; };
-		70DC32585D69B54F98B8662E /* ReturnCheckView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 094EF1333037AE5FE509A6F8 /* ReturnCheckView.swift */; };
-		D4F366A80998CDCE16D7F89C /* InventoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24CE6951265770DECFAE1C9B /* InventoryView.swift */; };
-		2C281CA76A1DA6680BB8D754 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D37B86E604E073AE01C53FC /* SettingsView.swift */; };
-		9C6FB0550F111C280EFD9B0E /* ConnectionStatusBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20B00D2731061D9E1E9D9656 /* ConnectionStatusBadge.swift */; };
-		785A8DC025DB336F21ADEE89 /* MultiTagWarningView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DD49E5415E2CBA12B428BF0 /* MultiTagWarningView.swift */; };
-		D3985A19D75C95C5E49C5376 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB23538ECA6E287AA7437368 /* Constants.swift */; };
+		0E6700C464BC1CE4F17F24FA /* Equipment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56756B1CF51FF0A8EE93E3CD /* Equipment.swift */; };
 		113ABCB25E6195CD9797AF6D /* Bundle+Version.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3091895DE9F8B7EE94EFD56D /* Bundle+Version.swift */; };
+		115DE7AF4CC65754168D830D /* ScanSoundPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7A6EE6214F4F4C1C059843E /* ScanSoundPlayer.swift */; };
+		1827877FC68A91B0B34DA84F /* Job.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97059FD098DF0C5D7C44FE53 /* Job.swift */; };
+		240487B519D571AB44043DAE /* RfidaHandheldApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D10F215C28C58630E4AB8FE /* RfidaHandheldApp.swift */; };
+		2C281CA76A1DA6680BB8D754 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D37B86E604E073AE01C53FC /* SettingsView.swift */; };
+		32E04E6A3BFFF62E03514A12 /* DeviceScanView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2FEB388DAE1072A47E440C2 /* DeviceScanView.swift */; };
 		3CF281539EA7DBCF3AB4FB8A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9DCA121B40CA436A76F5791A /* Assets.xcassets */; };
+		45D0E508BB0B79A924C9AA6B /* BLEManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 329AAEC8F18EAA601AC2D699 /* BLEManager.swift */; };
+		4B74DE75BE5B394DB28AA108 /* NUSProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4938B0BAA6C1D182E20BA4A /* NUSProtocol.swift */; };
+		70DC32585D69B54F98B8662E /* ReturnCheckView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 094EF1333037AE5FE509A6F8 /* ReturnCheckView.swift */; };
+		743FCF8A61C79CBD7E5ED3D3 /* InventoryModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C255E0C50DE7CA06837305E /* InventoryModels.swift */; };
+		785A8DC025DB336F21ADEE89 /* MultiTagWarningView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DD49E5415E2CBA12B428BF0 /* MultiTagWarningView.swift */; };
+		85A38DE02BB770D1A9A63697 /* MasterDataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B37D71068C76C527F5681A10 /* MasterDataStore.swift */; };
+		9C6FB0550F111C280EFD9B0E /* ConnectionStatusBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20B00D2731061D9E1E9D9656 /* ConnectionStatusBadge.swift */; };
+		A1A51301332352638DFC81BE /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C07CA46C06F1C1168C5771 /* APIClient.swift */; };
+		A5547A6D37D372F30026A07A /* CheckoutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7BE7F6F8EE0A83E0F5DFA64 /* CheckoutView.swift */; };
+		ABB00CEC60DA37755834EB0C /* Staff.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4780815F7FDEC9460F56DC22 /* Staff.swift */; };
+		B9579EA4A538D9305910F546 /* BLEDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 776971CE9652590BED9D8E9E /* BLEDevice.swift */; };
+		D3985A19D75C95C5E49C5376 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB23538ECA6E287AA7437368 /* Constants.swift */; };
+		D4F366A80998CDCE16D7F89C /* InventoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24CE6951265770DECFAE1C9B /* InventoryView.swift */; };
+		DAC35DEBF841B7D4773F318B /* RootTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA786609EAFA0D0364DE5C92 /* RootTabView.swift */; };
+		DD6F94B83FBDDD1D317AB1C9 /* TagRead.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE754ED90BE3FEA545644641 /* TagRead.swift */; };
+		DE7C858D0E4A05407B8A9EA7 /* CheckoutViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21BAC9AAD185EFE904092386 /* CheckoutViewModel.swift */; };
+		DE88406920981DE5D3DAF778 /* MovementModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 230FD97B4F41BC8898BE3C41 /* MovementModels.swift */; };
+		EC6C4195B2AD3152DF4B09CA /* ReturnDiffEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7838F671A603A3CB1786F85D /* ReturnDiffEngine.swift */; };
+		EED711E8AF538B0BFEC0F197 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 751FC6CE3D28C8034716057E /* HomeView.swift */; };
+		EFCCD609FDB08934E3710F8C /* RegisterTagViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4B61398DC67FB57B1CD76BA /* RegisterTagViewModel.swift */; };
+		FC822AA557C9D4379A59A7A0 /* RegisterTagView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB23CF4C209C70213D20B738 /* RegisterTagView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		9D10F215C28C58630E4AB8FE /* RfidaHandheldApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RfidaHandheldApp.swift; sourceTree = "<group>"; };
-		56756B1CF51FF0A8EE93E3CD /* Equipment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Equipment.swift; sourceTree = "<group>"; };
-		4780815F7FDEC9460F56DC22 /* Staff.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Staff.swift; sourceTree = "<group>"; };
-		97059FD098DF0C5D7C44FE53 /* Job.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Job.swift; sourceTree = "<group>"; };
-		230FD97B4F41BC8898BE3C41 /* MovementModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovementModels.swift; sourceTree = "<group>"; };
-		8C255E0C50DE7CA06837305E /* InventoryModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryModels.swift; sourceTree = "<group>"; };
-		DE754ED90BE3FEA545644641 /* TagRead.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagRead.swift; sourceTree = "<group>"; };
-		776971CE9652590BED9D8E9E /* BLEDevice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEDevice.swift; sourceTree = "<group>"; };
-		E4938B0BAA6C1D182E20BA4A /* NUSProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NUSProtocol.swift; sourceTree = "<group>"; };
-		329AAEC8F18EAA601AC2D699 /* BLEManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEManager.swift; sourceTree = "<group>"; };
-		14C07CA46C06F1C1168C5771 /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
-		B37D71068C76C527F5681A10 /* MasterDataStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MasterDataStore.swift; sourceTree = "<group>"; };
-		7838F671A603A3CB1786F85D /* ReturnDiffEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReturnDiffEngine.swift; sourceTree = "<group>"; };
-		A4B61398DC67FB57B1CD76BA /* RegisterTagViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterTagViewModel.swift; sourceTree = "<group>"; };
-		21BAC9AAD185EFE904092386 /* CheckoutViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutViewModel.swift; sourceTree = "<group>"; };
 		02B720A3D1D7D02FA51E0D03 /* ReturnCheckViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReturnCheckViewModel.swift; sourceTree = "<group>"; };
+		094EF1333037AE5FE509A6F8 /* ReturnCheckView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReturnCheckView.swift; sourceTree = "<group>"; };
+		14C07CA46C06F1C1168C5771 /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
+		20B00D2731061D9E1E9D9656 /* ConnectionStatusBadge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionStatusBadge.swift; sourceTree = "<group>"; };
+		21BAC9AAD185EFE904092386 /* CheckoutViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutViewModel.swift; sourceTree = "<group>"; };
+		230FD97B4F41BC8898BE3C41 /* MovementModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovementModels.swift; sourceTree = "<group>"; };
+		24CE6951265770DECFAE1C9B /* InventoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryView.swift; sourceTree = "<group>"; };
+		3091895DE9F8B7EE94EFD56D /* Bundle+Version.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Bundle+Version.swift"; sourceTree = "<group>"; };
+		329AAEC8F18EAA601AC2D699 /* BLEManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEManager.swift; sourceTree = "<group>"; };
+		4780815F7FDEC9460F56DC22 /* Staff.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Staff.swift; sourceTree = "<group>"; };
 		4D9A55B22D60150F2D73621F /* InventoryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryViewModel.swift; sourceTree = "<group>"; };
-		AA786609EAFA0D0364DE5C92 /* RootTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootTabView.swift; sourceTree = "<group>"; };
+		56756B1CF51FF0A8EE93E3CD /* Equipment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Equipment.swift; sourceTree = "<group>"; };
+		5DD49E5415E2CBA12B428BF0 /* MultiTagWarningView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiTagWarningView.swift; sourceTree = "<group>"; };
+		6390CCF4E230217F01457D7F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		6D37B86E604E073AE01C53FC /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		751FC6CE3D28C8034716057E /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
-		D2FEB388DAE1072A47E440C2 /* DeviceScanView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceScanView.swift; sourceTree = "<group>"; };
+		776971CE9652590BED9D8E9E /* BLEDevice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEDevice.swift; sourceTree = "<group>"; };
+		7838F671A603A3CB1786F85D /* ReturnDiffEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReturnDiffEngine.swift; sourceTree = "<group>"; };
+		8C255E0C50DE7CA06837305E /* InventoryModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryModels.swift; sourceTree = "<group>"; };
+		97059FD098DF0C5D7C44FE53 /* Job.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Job.swift; sourceTree = "<group>"; };
+		9D10F215C28C58630E4AB8FE /* RfidaHandheldApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RfidaHandheldApp.swift; sourceTree = "<group>"; };
+		9DCA121B40CA436A76F5791A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		A4B61398DC67FB57B1CD76BA /* RegisterTagViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterTagViewModel.swift; sourceTree = "<group>"; };
+		AA786609EAFA0D0364DE5C92 /* RootTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootTabView.swift; sourceTree = "<group>"; };
+		AB23538ECA6E287AA7437368 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
+		B37D71068C76C527F5681A10 /* MasterDataStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MasterDataStore.swift; sourceTree = "<group>"; };
+		B7A6EE6214F4F4C1C059843E /* ScanSoundPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanSoundPlayer.swift; sourceTree = "<group>"; };
 		BB23CF4C209C70213D20B738 /* RegisterTagView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterTagView.swift; sourceTree = "<group>"; };
 		C7BE7F6F8EE0A83E0F5DFA64 /* CheckoutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutView.swift; sourceTree = "<group>"; };
-		094EF1333037AE5FE509A6F8 /* ReturnCheckView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReturnCheckView.swift; sourceTree = "<group>"; };
-		24CE6951265770DECFAE1C9B /* InventoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryView.swift; sourceTree = "<group>"; };
-		6D37B86E604E073AE01C53FC /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
-		20B00D2731061D9E1E9D9656 /* ConnectionStatusBadge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionStatusBadge.swift; sourceTree = "<group>"; };
-		5DD49E5415E2CBA12B428BF0 /* MultiTagWarningView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiTagWarningView.swift; sourceTree = "<group>"; };
-		AB23538ECA6E287AA7437368 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
-		3091895DE9F8B7EE94EFD56D /* Bundle+Version.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bundle+Version.swift; sourceTree = "<group>"; };
-		9DCA121B40CA436A76F5791A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		D2FEB388DAE1072A47E440C2 /* DeviceScanView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceScanView.swift; sourceTree = "<group>"; };
+		DE754ED90BE3FEA545644641 /* TagRead.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagRead.swift; sourceTree = "<group>"; };
+		E4938B0BAA6C1D182E20BA4A /* NUSProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NUSProtocol.swift; sourceTree = "<group>"; };
 		E59939D32FD9EF98DC6098D4 /* RfidaHandheld.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RfidaHandheld.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -92,38 +95,6 @@
 			);
 			sourceTree = "<group>";
 		};
-		D250527E4DF2B556B2CC2E5E /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				E59939D32FD9EF98DC6098D4 /* RfidaHandheld.app */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
-		6879D820C2CFFDC40AE14AA9 /* RfidaHandheld */ = {
-			isa = PBXGroup;
-			children = (
-				E668974AC02A616B7D72DB5B /* App */,
-				12131CC4B6BBDFABDFE02BAB /* Models */,
-				567728B0AEB09E78CBB92877 /* BLE */,
-				179B1E792A6AF3BC18092AE0 /* Networking */,
-				2D67893CD675C19192435318 /* Data */,
-				FD1EC86E9427F91571776D83 /* ViewModels */,
-				82BDF6D1774E8DC0B7BA7714 /* Views */,
-				FA6A362FC82E4554021A3CC9 /* Utilities */,
-				9DCA121B40CA436A76F5791A /* Assets.xcassets */,
-			);
-			path = RfidaHandheld;
-			sourceTree = "<group>";
-		};
-		E668974AC02A616B7D72DB5B /* App */ = {
-			isa = PBXGroup;
-			children = (
-				9D10F215C28C58630E4AB8FE /* RfidaHandheldApp.swift */,
-			);
-			path = App;
-			sourceTree = "<group>";
-		};
 		12131CC4B6BBDFABDFE02BAB /* Models */ = {
 			isa = PBXGroup;
 			children = (
@@ -136,15 +107,6 @@
 				776971CE9652590BED9D8E9E /* BLEDevice.swift */,
 			);
 			path = Models;
-			sourceTree = "<group>";
-		};
-		567728B0AEB09E78CBB92877 /* BLE */ = {
-			isa = PBXGroup;
-			children = (
-				E4938B0BAA6C1D182E20BA4A /* NUSProtocol.swift */,
-				329AAEC8F18EAA601AC2D699 /* BLEManager.swift */,
-			);
-			path = BLE;
 			sourceTree = "<group>";
 		};
 		179B1E792A6AF3BC18092AE0 /* Networking */ = {
@@ -164,15 +126,39 @@
 			path = Data;
 			sourceTree = "<group>";
 		};
-		FD1EC86E9427F91571776D83 /* ViewModels */ = {
+		567728B0AEB09E78CBB92877 /* BLE */ = {
 			isa = PBXGroup;
 			children = (
-				A4B61398DC67FB57B1CD76BA /* RegisterTagViewModel.swift */,
-				21BAC9AAD185EFE904092386 /* CheckoutViewModel.swift */,
-				02B720A3D1D7D02FA51E0D03 /* ReturnCheckViewModel.swift */,
-				4D9A55B22D60150F2D73621F /* InventoryViewModel.swift */,
+				E4938B0BAA6C1D182E20BA4A /* NUSProtocol.swift */,
+				329AAEC8F18EAA601AC2D699 /* BLEManager.swift */,
 			);
-			path = ViewModels;
+			path = BLE;
+			sourceTree = "<group>";
+		};
+		6879D820C2CFFDC40AE14AA9 /* RfidaHandheld */ = {
+			isa = PBXGroup;
+			children = (
+				E668974AC02A616B7D72DB5B /* App */,
+				12131CC4B6BBDFABDFE02BAB /* Models */,
+				567728B0AEB09E78CBB92877 /* BLE */,
+				179B1E792A6AF3BC18092AE0 /* Networking */,
+				2D67893CD675C19192435318 /* Data */,
+				FD1EC86E9427F91571776D83 /* ViewModels */,
+				82BDF6D1774E8DC0B7BA7714 /* Views */,
+				FA6A362FC82E4554021A3CC9 /* Utilities */,
+				9DCA121B40CA436A76F5791A /* Assets.xcassets */,
+				6390CCF4E230217F01457D7F /* Info.plist */,
+			);
+			path = RfidaHandheld;
+			sourceTree = "<group>";
+		};
+		7550883A6AE635B9AE5D9A41 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				20B00D2731061D9E1E9D9656 /* ConnectionStatusBadge.swift */,
+				5DD49E5415E2CBA12B428BF0 /* MultiTagWarningView.swift */,
+			);
+			path = Components;
 			sourceTree = "<group>";
 		};
 		82BDF6D1774E8DC0B7BA7714 /* Views */ = {
@@ -191,22 +177,41 @@
 			path = Views;
 			sourceTree = "<group>";
 		};
+		D250527E4DF2B556B2CC2E5E /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				E59939D32FD9EF98DC6098D4 /* RfidaHandheld.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		E668974AC02A616B7D72DB5B /* App */ = {
+			isa = PBXGroup;
+			children = (
+				9D10F215C28C58630E4AB8FE /* RfidaHandheldApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
 		FA6A362FC82E4554021A3CC9 /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
 				AB23538ECA6E287AA7437368 /* Constants.swift */,
 				3091895DE9F8B7EE94EFD56D /* Bundle+Version.swift */,
+				B7A6EE6214F4F4C1C059843E /* ScanSoundPlayer.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
 		};
-		7550883A6AE635B9AE5D9A41 /* Components */ = {
+		FD1EC86E9427F91571776D83 /* ViewModels */ = {
 			isa = PBXGroup;
 			children = (
-				20B00D2731061D9E1E9D9656 /* ConnectionStatusBadge.swift */,
-				5DD49E5415E2CBA12B428BF0 /* MultiTagWarningView.swift */,
+				A4B61398DC67FB57B1CD76BA /* RegisterTagViewModel.swift */,
+				21BAC9AAD185EFE904092386 /* CheckoutViewModel.swift */,
+				02B720A3D1D7D02FA51E0D03 /* ReturnCheckViewModel.swift */,
+				4D9A55B22D60150F2D73621F /* InventoryViewModel.swift */,
 			);
-			path = Components;
+			path = ViewModels;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -307,6 +312,7 @@
 				785A8DC025DB336F21ADEE89 /* MultiTagWarningView.swift in Sources */,
 				D3985A19D75C95C5E49C5376 /* Constants.swift in Sources */,
 				113ABCB25E6195CD9797AF6D /* Bundle+Version.swift in Sources */,
+				115DE7AF4CC65754168D830D /* ScanSoundPlayer.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -376,6 +382,30 @@
 			};
 			name = Debug;
 		};
+		64056630FAB5E6917E06AD68 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "";
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = RfidaHandheld/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.rfida.RfidaHandheld;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
 		8F989209CF9E329A92B45EC4 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -432,37 +462,6 @@
 			};
 			name = Release;
 		};
-		64056630FAB5E6917E06AD68 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "";
-				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "RFID 手提機";
-				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "此App需要使用藍牙連接RFID讀寫手提機,以接收掃描到嘅標籤資料。";
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				INFOPLIST_KEY_UIApplicationSupportsIndoorNavigation = NO;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.rfida.RfidaHandheld;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
 		F962B50EE3026D65223630C3 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -472,14 +471,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "";
 				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "RFID 手提機";
-				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "此App需要使用藍牙連接RFID讀寫手提機,以接收掃描到嘅標籤資料。";
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				INFOPLIST_KEY_UIApplicationSupportsIndoorNavigation = NO;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_FILE = RfidaHandheld/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -516,7 +508,6 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
-
 	};
 	rootObject = 02B84600269A33F27994289E /* Project object */;
 }

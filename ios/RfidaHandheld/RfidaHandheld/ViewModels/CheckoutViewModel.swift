@@ -18,6 +18,7 @@ final class CheckoutViewModel: ObservableObject {
         for read in reads where !seen.contains(read.epc) {
             seen.insert(read.epc)
             scannedEPCs.append(read.epc)
+            ScanSoundPlayer.shared.playScanBeep()
         }
     }
 
@@ -31,7 +32,7 @@ final class CheckoutViewModel: ObservableObject {
         seen.removeAll()
     }
 
-    func submit(masterData: MasterDataStore) async {
+    func submit() async {
         guard let staffId = selectedStaffId else {
             lastError = "請先選擇員工"; return
         }

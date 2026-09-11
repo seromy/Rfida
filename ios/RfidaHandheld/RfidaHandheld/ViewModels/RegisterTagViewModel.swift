@@ -26,6 +26,7 @@ final class RegisterTagViewModel: ObservableObject {
         for read in reads where !knownEPCs.contains(read.epc) {
             if !detectedEPCs.contains(read.epc) {
                 detectedEPCs.append(read.epc)
+                ScanSoundPlayer.shared.playScanBeep()
             }
         }
     }
