@@ -18,6 +18,21 @@ final class BLEManager: NSObject, ObservableObject {
     @Published private(set) var state: ConnectionState = .disconnected
     @Published private(set) var discoveredDevices: [BLEDevice] = []
     @Published var namePrefixFilter: String = UserDefaults.standard.string(forKey: SettingsKey.blePrefix) ?? "RFID"
+    /// 示範模式(設定內嘅開關):開啟後唔會用真實CoreBluetooth,
+    /// 改為模擬一個已連接嘅「示範手提機」同定時模擬掃描到EPC,方便冇實機都可以示範四大情景。
+    @Published var isDemoMode: Bool = UserDefaults.standard.bool(forKey: SettingsKey.demoMode) {
+        didSet {
+            guard oldValue != isDemoMode else { return }
+            UserDefaults.standard.set(isDemoMode, forKey: SettingsKey.demoMode)
+            if isDemoMode {
+                simulateDemoConnect()
+            } else {
+                demoTimer?.invalidate()
+                demoTimer = nil
+                centralManagerDidUpdateState(central)
+            }
+        }
+    }
 
     /// 目前活躍嘅畫面(情景1-4其中一個)會設定呢個closure嚟接收掃描到嘅EPC。
     var onTagsRead: (([TagRead]) -> Void)?
@@ -33,13 +48,22 @@ final class BLEManager: NSObject, ObservableObject {
     /// `.poweredOn`嗰陣自動補做一次掃描,唔使使用者自己發現要撳多次「搜尋」。
     private var wantsScanning = false
 
+    private var demoTimer: Timer?
+    private var demoScanMode: ScanMode = .idle
+    private var demoEmittedCount = 0
+
     override init() {
         super.init()
         central = CBCentralManager(delegate: self, queue: nil)
+        if isDemoMode { simulateDemoConnect() }
     }
 
     func startScan() {
         wantsScanning = true
+        if isDemoMode {
+            simulateDemoConnect()
+            return
+        }
         discoveredDevices.removeAll()
         guard central.state == .poweredOn else { return }
         state = .scanning
@@ -48,6 +72,7 @@ final class BLEManager: NSObject, ObservableObject {
 
     func stopScan() {
         wantsScanning = false
+        if isDemoMode { return }
         central.stopScan()
         if state == .scanning { state = .disconnected }
     }
@@ -60,12 +85,23 @@ final class BLEManager: NSObject, ObservableObject {
     }
 
     func disconnect() {
+        if isDemoMode {
+            demoTimer?.invalidate()
+            demoTimer = nil
+            state = .disconnected
+            return
+        }
         guard let peripheral = connectedPeripheral else { return }
         central.cancelPeripheralConnection(peripheral)
     }
 
     /// 通知ESP32韌體切換掃描模式(情景1低功率隔離 vs 情景2-4批量讀取,見方案書7.1-7.2)。
+    /// 示範模式下改為啟動/停止模擬掃描嘅timer,唔會實際寫BLE characteristic。
     func send(mode: ScanMode) {
+        if isDemoMode {
+            startDemoEmission(mode: mode)
+            return
+        }
         send(command: mode.rawValue)
     }
 
@@ -75,6 +111,53 @@ final class BLEManager: NSObject, ObservableObject {
               let data = (command + "\n").data(using: .utf8) else { return }
         let type: CBCharacteristicWriteType = rx.properties.contains(.writeWithoutResponse) ? .withoutResponse : .withResponse
         peripheral.writeValue(data, for: rx, type: type)
+    }
+
+    // MARK: - 示範模式(Demo Mode)
+
+    private func simulateDemoConnect() {
+        demoTimer?.invalidate()
+        demoTimer = nil
+        state = .connecting
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+            guard let self, self.isDemoMode else { return }
+            self.state = .connected(deviceName: "示範手提機(Demo)")
+        }
+    }
+
+    private func startDemoEmission(mode: ScanMode) {
+        demoTimer?.invalidate()
+        demoTimer = nil
+        demoScanMode = mode
+        demoEmittedCount = 0
+        guard mode != .idle else { return }
+        demoTimer = Timer.scheduledTimer(withTimeInterval: 1.6, repeats: true) { [weak self] _ in
+            self?.emitDemoReads()
+        }
+    }
+
+    /// 模擬讀寫模組讀到EPC:情景1(register)每次讀一件(偶爾同時讀兩件,
+    /// 模擬多標籤衝突警告);情景2-4(batch)逐件循環讀盡示範器材清單。
+    private func emitDemoReads() {
+        let reads: [TagRead]
+        switch demoScanMode {
+        case .idle:
+            return
+        case .register:
+            let pool = DemoData.unregisteredEPCs
+            let isMultiTagTick = demoEmittedCount > 0 && demoEmittedCount % 4 == 3
+            let count = isMultiTagTick ? 2 : 1
+            reads = (0..<count).map { offset in
+                TagRead(epc: pool[(demoEmittedCount + offset) % pool.count], rssi: Int.random(in: -70 ... -40), timestamp: Date())
+            }
+            demoEmittedCount += count
+        case .batch:
+            let pool = DemoData.equipment.map(\.epc)
+            let epc = pool[demoEmittedCount % pool.count]
+            reads = [TagRead(epc: epc, rssi: Int.random(in: -70 ... -40), timestamp: Date())]
+            demoEmittedCount += 1
+        }
+        onTagsRead?(reads)
     }
 }
 

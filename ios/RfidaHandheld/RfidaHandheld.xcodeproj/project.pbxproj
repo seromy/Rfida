@@ -18,6 +18,8 @@
 		32E04E6A3BFFF62E03514A12 /* DeviceScanView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2FEB388DAE1072A47E440C2 /* DeviceScanView.swift */; };
 		3CF281539EA7DBCF3AB4FB8A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9DCA121B40CA436A76F5791A /* Assets.xcassets */; };
 		45D0E508BB0B79A924C9AA6B /* BLEManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 329AAEC8F18EAA601AC2D699 /* BLEManager.swift */; };
+		AA11BB22CC33DD44EE55FF02 /* DemoData.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11BB22CC33DD44EE55FF01 /* DemoData.swift */; };
+		AA11BB22CC33DD44EE55FF04 /* DemoDataProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11BB22CC33DD44EE55FF03 /* DemoDataProvider.swift */; };
 		4B74DE75BE5B394DB28AA108 /* NUSProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4938B0BAA6C1D182E20BA4A /* NUSProtocol.swift */; };
 		70DC32585D69B54F98B8662E /* ReturnCheckView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 094EF1333037AE5FE509A6F8 /* ReturnCheckView.swift */; };
 		743FCF8A61C79CBD7E5ED3D3 /* InventoryModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C255E0C50DE7CA06837305E /* InventoryModels.swift */; };
@@ -50,6 +52,8 @@
 		24CE6951265770DECFAE1C9B /* InventoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryView.swift; sourceTree = "<group>"; };
 		3091895DE9F8B7EE94EFD56D /* Bundle+Version.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Bundle+Version.swift"; sourceTree = "<group>"; };
 		329AAEC8F18EAA601AC2D699 /* BLEManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEManager.swift; sourceTree = "<group>"; };
+		AA11BB22CC33DD44EE55FF01 /* DemoData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoData.swift; sourceTree = "<group>"; };
+		AA11BB22CC33DD44EE55FF03 /* DemoDataProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoDataProvider.swift; sourceTree = "<group>"; };
 		4780815F7FDEC9460F56DC22 /* Staff.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Staff.swift; sourceTree = "<group>"; };
 		4D9A55B22D60150F2D73621F /* InventoryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryViewModel.swift; sourceTree = "<group>"; };
 		56756B1CF51FF0A8EE93E3CD /* Equipment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Equipment.swift; sourceTree = "<group>"; };
@@ -113,6 +117,7 @@
 			isa = PBXGroup;
 			children = (
 				14C07CA46C06F1C1168C5771 /* APIClient.swift */,
+				AA11BB22CC33DD44EE55FF03 /* DemoDataProvider.swift */,
 			);
 			path = Networking;
 			sourceTree = "<group>";
@@ -122,6 +127,7 @@
 			children = (
 				B37D71068C76C527F5681A10 /* MasterDataStore.swift */,
 				7838F671A603A3CB1786F85D /* ReturnDiffEngine.swift */,
+				AA11BB22CC33DD44EE55FF01 /* DemoData.swift */,
 			);
 			path = Data;
 			sourceTree = "<group>";
@@ -294,7 +300,9 @@
 				4B74DE75BE5B394DB28AA108 /* NUSProtocol.swift in Sources */,
 				45D0E508BB0B79A924C9AA6B /* BLEManager.swift in Sources */,
 				A1A51301332352638DFC81BE /* APIClient.swift in Sources */,
+				AA11BB22CC33DD44EE55FF04 /* DemoDataProvider.swift in Sources */,
 				85A38DE02BB770D1A9A63697 /* MasterDataStore.swift in Sources */,
+				AA11BB22CC33DD44EE55FF02 /* DemoData.swift in Sources */,
 				EC6C4195B2AD3152DF4B09CA /* ReturnDiffEngine.swift in Sources */,
 				EFCCD609FDB08934E3710F8C /* RegisterTagViewModel.swift in Sources */,
 				DE7C858D0E4A05407B8A9EA7 /* CheckoutViewModel.swift in Sources */,
