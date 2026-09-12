@@ -38,7 +38,7 @@ struct ReturnCheckView: View {
                         LabeledContent("應有", value: "\(viewModel.expectedItems.count)")
                         LabeledContent("已核對", value: "\(diff.matched.count)")
                         LabeledContent("缺件", value: "\(diff.missing.count)")
-                            .foregroundStyle(diff.missing.isEmpty ? .primary : .red)
+                            .foregroundStyle(diff.missing.isEmpty ? AnyShapeStyle(.primary) : AnyShapeStyle(.red))
                     }
 
                     if !diff.missing.isEmpty {
