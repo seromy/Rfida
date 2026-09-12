@@ -8,11 +8,19 @@ struct SettingsView: View {
 
     var body: some View {
         Form {
+            Section("示範模式") {
+                Toggle("示範模式(Demo Mode)", isOn: $ble.isDemoMode)
+                Text("開啟後,App會自動連接一個模擬嘅示範手提機,並用內置嘅假器材/員工/Job資料,唔需要真實RFID硬件或後台伺服器,方便展示四大使用情景。")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
             Section("後台伺服器") {
                 TextField("http://192.168.1.50:5000", text: $backendBaseURL)
                     .keyboardType(.URL)
                     .textInputAutocapitalization(.never)
                     .autocorrectionDisabled()
+                    .disabled(ble.isDemoMode)
                 Button("重新載入資料") {
                     Task { await masterData.refreshAll() }
                 }
@@ -30,6 +38,7 @@ struct SettingsView: View {
                     .onChange(of: ble.namePrefixFilter) { newValue in
                         UserDefaults.standard.set(newValue, forKey: SettingsKey.blePrefix)
                     }
+                    .disabled(ble.isDemoMode)
             }
 
             Section("關於") {
@@ -37,5 +46,8 @@ struct SettingsView: View {
             }
         }
         .navigationTitle("設定")
+        .onChange(of: ble.isDemoMode) { _ in
+            Task { await masterData.refreshAll() }
+        }
     }
 }
