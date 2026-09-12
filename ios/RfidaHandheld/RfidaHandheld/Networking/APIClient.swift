@@ -43,25 +43,38 @@ actor APIClient {
         return url
     }
 
+    /// 示範模式(設定內嘅開關):開啟後所有API改用 DemoDataProvider 嘅假資料,
+    /// 唔會發出任何網絡請求,方便冇後台伺服器/冇實機都可以完整示範。
+    private var isDemoMode: Bool {
+        UserDefaults.standard.bool(forKey: SettingsKey.demoMode)
+    }
+
     func fetchEquipment() async throws -> [Equipment] {
-        try await get("/api/equipment")
+        if isDemoMode { return await DemoDataProvider.shared.fetchEquipment() }
+        return try await get("/api/equipment")
     }
 
     func fetchStaff() async throws -> [Staff] {
-        try await get("/api/staff")
+        if isDemoMode { return await DemoDataProvider.shared.fetchStaff() }
+        return try await get("/api/staff")
     }
 
     func fetchOpenJobs() async throws -> [Job] {
-        try await get("/api/jobs?status=open")
+        if isDemoMode { return await DemoDataProvider.shared.fetchOpenJobs() }
+        return try await get("/api/jobs?status=open")
     }
 
     /// 情景3(返office前清點)用:取得某個Job出Job時嘅「應有清單」,俾App做清單比對。
     func fetchExpectedItems(jobId: Int) async throws -> [MovementItem] {
-        try await get("/api/jobs/\(jobId)/expected-items")
+        if isDemoMode { return await DemoDataProvider.shared.fetchExpectedItems(jobId: jobId) }
+        return try await get("/api/jobs/\(jobId)/expected-items")
     }
 
     /// 情景1(錄入新標籤):將EPC同器材資料配對登記。
     func registerTag(epc: String, name: String, category: String, serialNumber: String?) async throws -> Equipment {
+        if isDemoMode {
+            return await DemoDataProvider.shared.registerTag(epc: epc, name: name, category: category, serialNumber: serialNumber)
+        }
         struct Body: Encodable {
             var epc: String
             var name: String
@@ -73,11 +86,13 @@ actor APIClient {
 
     /// 情景2(出發前登記)/ 情景3(返office前清點)共用:提交出/入紀錄。
     func submitMovement(_ submission: MovementSubmission) async throws {
+        if isDemoMode { return await DemoDataProvider.shared.submitMovement(submission) }
         let _: EmptyResponse = try await post("/api/movements", body: submission)
     }
 
     /// 情景4(定期盤點):提交一個盤點批次嘅結果。
     func submitInventory(_ submission: InventorySubmission) async throws {
+        if isDemoMode { return await DemoDataProvider.shared.submitInventory(submission) }
         let _: EmptyResponse = try await post("/api/inventory-sessions", body: submission)
     }
 

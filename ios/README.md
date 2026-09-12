@@ -39,6 +39,10 @@ ios/RfidaHandheld/
 
 首頁(Home)顯示BLE連接狀態同器材/員工/Job資料概況;設定畫面可設定後台伺服器網址、BLE裝置名稱過濾字串,以及掃描提示聲嘅靜音開關。
 
+### 示範模式(Demo Mode)
+
+設定畫面入面有個「示範模式」開關,開啟後App會自動連接一部模擬嘅「示範手提機」,並改用內置嘅假器材/員工/Job資料(`Data/DemoData.swift`、`Networking/DemoDataProvider.swift`),四個情景畫面都會定時模擬掃描到EPC,唔需要真實ESP32手提機或後台伺服器就可以完整行一次四大使用情景,方便Demo或App Store審查。關閉開關即刻返回正常模式,改用真實BLE同後台伺服器。
+
 四個情景每次成功掃描到「新」標籤(即之前未見過嘅EPC)都會發出一下短嗶聲(`Utilities/ScanSoundPlayer.swift`,即時合成、唔需要綁定音效檔案),提示聲唔跟手機側邊靜音撥掣,只受「設定」入面嘅靜音模式開關控制。
 
 ## 對外介面
