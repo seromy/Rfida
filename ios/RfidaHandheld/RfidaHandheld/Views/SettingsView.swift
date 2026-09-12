@@ -34,9 +34,6 @@ struct SettingsView: View {
 
             Section("關於") {
                 LabeledContent("App 版本", value: Bundle.main.appVersionString)
-                Text("此App冇獨立登入/權限系統,假設喺辦公室內部信任網絡環境使用(方案書第9節)。")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
             }
         }
         .navigationTitle("設定")

@@ -33,12 +33,6 @@ struct HomeView: View {
                         Task { await masterData.refreshAll() }
                     }
                 }
-
-                Section {
-                    Text("四大使用情景已分佈喺下方分頁:錄入標籤、出Job登記、歸還清點、定期盤點。")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
             }
             .navigationTitle("RFID 器材管理")
             .toolbar {
