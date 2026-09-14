@@ -24,6 +24,7 @@
 		70DC32585D69B54F98B8662E /* ReturnCheckView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 094EF1333037AE5FE509A6F8 /* ReturnCheckView.swift */; };
 		743FCF8A61C79CBD7E5ED3D3 /* InventoryModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C255E0C50DE7CA06837305E /* InventoryModels.swift */; };
 		785A8DC025DB336F21ADEE89 /* MultiTagWarningView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DD49E5415E2CBA12B428BF0 /* MultiTagWarningView.swift */; };
+		AA11BB22CC33DD44EE55FF10 /* TagScanControlButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11BB22CC33DD44EE55FF11 /* TagScanControlButton.swift */; };
 		85A38DE02BB770D1A9A63697 /* MasterDataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B37D71068C76C527F5681A10 /* MasterDataStore.swift */; };
 		9C6FB0550F111C280EFD9B0E /* ConnectionStatusBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20B00D2731061D9E1E9D9656 /* ConnectionStatusBadge.swift */; };
 		A1A51301332352638DFC81BE /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C07CA46C06F1C1168C5771 /* APIClient.swift */; };
@@ -58,6 +59,7 @@
 		4D9A55B22D60150F2D73621F /* InventoryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryViewModel.swift; sourceTree = "<group>"; };
 		56756B1CF51FF0A8EE93E3CD /* Equipment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Equipment.swift; sourceTree = "<group>"; };
 		5DD49E5415E2CBA12B428BF0 /* MultiTagWarningView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiTagWarningView.swift; sourceTree = "<group>"; };
+		AA11BB22CC33DD44EE55FF11 /* TagScanControlButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagScanControlButton.swift; sourceTree = "<group>"; };
 		6390CCF4E230217F01457D7F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		6D37B86E604E073AE01C53FC /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		751FC6CE3D28C8034716057E /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
@@ -163,6 +165,7 @@
 			children = (
 				20B00D2731061D9E1E9D9656 /* ConnectionStatusBadge.swift */,
 				5DD49E5415E2CBA12B428BF0 /* MultiTagWarningView.swift */,
+				AA11BB22CC33DD44EE55FF11 /* TagScanControlButton.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -318,6 +321,7 @@
 				2C281CA76A1DA6680BB8D754 /* SettingsView.swift in Sources */,
 				9C6FB0550F111C280EFD9B0E /* ConnectionStatusBadge.swift in Sources */,
 				785A8DC025DB336F21ADEE89 /* MultiTagWarningView.swift in Sources */,
+				AA11BB22CC33DD44EE55FF10 /* TagScanControlButton.swift in Sources */,
 				D3985A19D75C95C5E49C5376 /* Constants.swift in Sources */,
 				113ABCB25E6195CD9797AF6D /* Bundle+Version.swift in Sources */,
 				115DE7AF4CC65754168D830D /* ScanSoundPlayer.swift in Sources */,

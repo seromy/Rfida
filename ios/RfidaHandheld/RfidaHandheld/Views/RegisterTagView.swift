@@ -11,6 +11,8 @@ struct RegisterTagView: View {
             Form {
                 Section { ConnectionStatusBadge() }
 
+                TagScanControlButton(mode: .register)
+
                 if viewModel.hasMultipleTags {
                     Section {
                         MultiTagWarningView(count: viewModel.detectedEPCs.count)
@@ -63,10 +65,9 @@ struct RegisterTagView: View {
             .onAppear {
                 viewModel.updateKnownEPCs(Set(masterData.equipment.map { $0.epc.uppercased() }))
                 ble.onTagsRead = { reads in viewModel.handle(reads: reads) }
-                ble.send(mode: .register)
             }
             .onDisappear {
-                ble.send(mode: .idle)
+                ble.stopTagScan()
                 ble.onTagsRead = nil
             }
         }

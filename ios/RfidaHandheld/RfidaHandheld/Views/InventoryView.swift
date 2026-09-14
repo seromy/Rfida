@@ -11,6 +11,8 @@ struct InventoryView: View {
             Form {
                 Section { ConnectionStatusBadge() }
 
+                TagScanControlButton(mode: .batch)
+
                 Section("盤點批次") {
                     Picker("員工", selection: $viewModel.selectedStaffId) {
                         Text("請選擇").tag(Int?.none)
@@ -60,10 +62,9 @@ struct InventoryView: View {
             .navigationTitle("4. 定期盤點")
             .onAppear {
                 ble.onTagsRead = { reads in viewModel.handle(reads: reads) }
-                ble.send(mode: .batch)
             }
             .onDisappear {
-                ble.send(mode: .idle)
+                ble.stopTagScan()
                 ble.onTagsRead = nil
             }
         }

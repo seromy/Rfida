@@ -15,8 +15,16 @@ final class BLEManager: NSObject, ObservableObject {
         case connected(deviceName: String)
     }
 
+    /// 手動「開始/停止掃描」按鈕嘅逾時保護:避免使用者撳咗開始之後忘記撳停止,
+    /// 讀寫模組一直發射RF、手提機電量白白被消耗。1分鐘後會自動停止,同人手撳停止效果一樣。
+    static let tagScanTimeout: TimeInterval = 60
+
     @Published private(set) var state: ConnectionState = .disconnected
     @Published private(set) var discoveredDevices: [BLEDevice] = []
+    /// 4大情景畫面嘅「開始/停止掃描」按鈕狀態,與DeviceScanView搵裝置嗰個`state == .scanning`無關。
+    @Published private(set) var isTagScanning = false
+    /// 畀UI顯示「將於 XX 秒後自動停止」嘅倒數。
+    @Published private(set) var tagScanRemainingSeconds: Int = 0
     @Published var namePrefixFilter: String = UserDefaults.standard.string(forKey: SettingsKey.blePrefix) ?? "RFID"
     /// 示範模式(設定內嘅開關):開啟後唔會用真實CoreBluetooth,
     /// 改為模擬一個已連接嘅「示範手提機」同定時模擬掃描到EPC,方便冇實機都可以示範四大情景。
@@ -51,6 +59,15 @@ final class BLEManager: NSObject, ObservableObject {
     private var demoTimer: Timer?
     private var demoScanMode: ScanMode = .idle
     private var demoEmittedCount = 0
+
+    private var tagScanTimeoutTimer: Timer?
+    private var tagScanCountdownTimer: Timer?
+    private var tagScanDeadline: Date?
+
+    var isConnected: Bool {
+        if case .connected = state { return true }
+        return false
+    }
 
     override init() {
         super.init()
@@ -131,6 +148,43 @@ final class BLEManager: NSObject, ObservableObject {
               let data = (command + "\n").data(using: .utf8) else { return }
         let type: CBCharacteristicWriteType = rx.properties.contains(.writeWithoutResponse) ? .withoutResponse : .withResponse
         peripheral.writeValue(data, for: rx, type: type)
+    }
+
+    // MARK: - 4大情景畫面嘅「開始/停止掃描」按鈕
+
+    /// 撳「開始掃描」:通知讀寫模組進入指定模式,並排一個1分鐘後自動`stopTagScan()`嘅逾時。
+    func startTagScan(mode: ScanMode) {
+        guard !isTagScanning else { return }
+        isTagScanning = true
+        send(mode: mode)
+
+        let deadline = Date().addingTimeInterval(Self.tagScanTimeout)
+        tagScanDeadline = deadline
+        tagScanRemainingSeconds = Int(Self.tagScanTimeout)
+
+        tagScanTimeoutTimer?.invalidate()
+        tagScanTimeoutTimer = Timer.scheduledTimer(withTimeInterval: Self.tagScanTimeout, repeats: false) { [weak self] _ in
+            self?.stopTagScan()
+        }
+
+        tagScanCountdownTimer?.invalidate()
+        tagScanCountdownTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
+            guard let self, let deadline = self.tagScanDeadline else { return }
+            self.tagScanRemainingSeconds = max(0, Int(deadline.timeIntervalSinceNow.rounded()))
+        }
+    }
+
+    /// 撳「停止掃描」,或者1分鐘逾時自動觸發:通知讀寫模組轉返`.idle`並取消逾時計時。
+    func stopTagScan() {
+        guard isTagScanning else { return }
+        tagScanTimeoutTimer?.invalidate()
+        tagScanTimeoutTimer = nil
+        tagScanCountdownTimer?.invalidate()
+        tagScanCountdownTimer = nil
+        tagScanDeadline = nil
+        isTagScanning = false
+        tagScanRemainingSeconds = 0
+        send(mode: .idle)
     }
 
     // MARK: - 示範模式(Demo Mode)
@@ -222,6 +276,7 @@ extension BLEManager: CBCentralManagerDelegate {
         rxCharacteristic = nil
         txCharacteristic = nil
         state = .disconnected
+        stopTagScan()
     }
 }
 
