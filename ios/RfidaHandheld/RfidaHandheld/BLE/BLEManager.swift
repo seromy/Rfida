@@ -64,10 +64,30 @@ final class BLEManager: NSObject, ObservableObject {
             simulateDemoConnect()
             return
         }
-        discoveredDevices.removeAll()
         guard central.state == .poweredOn else { return }
+        if reconnectAlreadyConnectedPeripheralIfNeeded() { return }
+        discoveredDevices.removeAll()
         state = .scanning
         central.scanForPeripherals(withServices: [NUSProtocol.serviceUUID], options: [CBCentralManagerScanOptionAllowDuplicatesKey: true])
+    }
+
+    /// BLE peripheral一旦已經同呢部iPhone有連接(包括之前連接過、由系統藍牙layer keep住嗰種),
+    /// 就通常唔會再廣播,`scanForPeripherals`就永遠搵唔返佢 —— 呢個係「iOS藍牙清單話已連接,
+    /// App卻一直顯示未連接」嘅根本原因。呢度用`retrieveConnectedPeripherals`直接攞返呢啲
+    /// 裝置(唔使靠廣播),搵到就自動幫使用者連接,唔使佢自己喺清單度揀。
+    /// 回傳true代表已經觸發緊一次連接(呼叫方應該避免同時再開始掃描,以免覆寫`.connecting`狀態)。
+    @discardableResult
+    private func reconnectAlreadyConnectedPeripheralIfNeeded() -> Bool {
+        guard connectedPeripheral == nil, state != .connecting else { return false }
+        let alreadyConnected = central.retrieveConnectedPeripherals(withServices: [NUSProtocol.serviceUUID])
+            .filter { peripheral in
+                let name = peripheral.name ?? ""
+                return namePrefixFilter.isEmpty || name.hasPrefix(namePrefixFilter)
+            }
+        guard let peripheral = alreadyConnected.first else { return false }
+        let device = BLEDevice(id: peripheral.identifier, peripheral: peripheral, name: peripheral.name ?? "RFID 手提機", rssi: 0)
+        connect(device)
+        return true
     }
 
     func stopScan() {
@@ -166,6 +186,7 @@ extension BLEManager: CBCentralManagerDelegate {
         switch central.state {
         case .poweredOn:
             state = .disconnected
+            if reconnectAlreadyConnectedPeripheralIfNeeded() { return }
             if wantsScanning { startScan() }
         case .unauthorized:
             state = .unauthorized
