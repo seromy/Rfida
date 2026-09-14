@@ -66,6 +66,7 @@ final class BLEManager: NSObject, ObservableObject {
         }
         guard central.state == .poweredOn else { return }
         if reconnectAlreadyConnectedPeripheralIfNeeded() { return }
+        guard connectedPeripheral == nil, state != .connecting else { return }
         discoveredDevices.removeAll()
         state = .scanning
         central.scanForPeripherals(withServices: [NUSProtocol.serviceUUID], options: [CBCentralManagerScanOptionAllowDuplicatesKey: true])
