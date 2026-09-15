@@ -15,9 +15,12 @@ final class BLEManager: NSObject, ObservableObject {
         case connected(deviceName: String)
     }
 
-    /// 手動「開始/停止掃描」按鈕嘅逾時保護:避免使用者撳咗開始之後忘記撳停止,
-    /// 讀寫模組一直發射RF、手提機電量白白被消耗。1分鐘後會自動停止,同人手撳停止效果一樣。
-    static let tagScanTimeout: TimeInterval = 60
+    /// 配合 RfidaBLETest 嘅短時間實機測試：1.5 秒後發送 MODE:IDLE。
+    /// 呢個係 App 本地計時，唔代表已收到讀寫器停止成功回覆。
+    /// ESP32 仍需保留獨立逾時保護；目前韌體每次開機只容許掃描一次。
+    static let tagScanTimeout: TimeInterval = 1.5
+    /// 示範資料每 1.6 秒產生一次，示範模式保留原有 60 秒窗口。
+    private static let demoTagScanTimeout: TimeInterval = 60
 
     @Published private(set) var state: ConnectionState = .disconnected
     @Published private(set) var discoveredDevices: [BLEDevice] = []
@@ -156,29 +159,37 @@ final class BLEManager: NSObject, ObservableObject {
 
     // MARK: - 4大情景畫面嘅「開始/停止掃描」按鈕
 
-    /// 撳「開始掃描」:通知讀寫模組進入指定模式,並排一個1分鐘後自動`stopTagScan()`嘅逾時。
+    /// 撳「開始掃描」後安排本地停止計時；實機 1.5 秒、示範 60 秒。
     func startTagScan(mode: ScanMode) {
         guard !isTagScanning else { return }
         isTagScanning = true
         send(mode: mode)
 
-        let deadline = Date().addingTimeInterval(Self.tagScanTimeout)
+        let duration = isDemoMode ? Self.demoTagScanTimeout : Self.tagScanTimeout
+        let deadline = Date().addingTimeInterval(duration)
         tagScanDeadline = deadline
-        tagScanRemainingSeconds = Int(Self.tagScanTimeout)
+        // 現有 UI 顯示整秒，向上取整，避免尚未停止就顯示 0 秒。
+        tagScanRemainingSeconds = Int(duration.rounded(.up))
 
         tagScanTimeoutTimer?.invalidate()
-        tagScanTimeoutTimer = Timer.scheduledTimer(withTimeInterval: Self.tagScanTimeout, repeats: false) { [weak self] _ in
+        let timeoutTimer = Timer(timeInterval: duration, repeats: false) { [weak self] _ in
             self?.stopTagScan()
         }
+        tagScanTimeoutTimer = timeoutTimer
+        // 使用 common mode，捲動畫面時仍可處理停止計時。
+        RunLoop.main.add(timeoutTimer, forMode: .common)
 
         tagScanCountdownTimer?.invalidate()
-        tagScanCountdownTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
+        let countdownTimer = Timer(timeInterval: 0.1, repeats: true) { [weak self] _ in
             guard let self, let deadline = self.tagScanDeadline else { return }
-            self.tagScanRemainingSeconds = max(0, Int(deadline.timeIntervalSinceNow.rounded()))
+            self.tagScanRemainingSeconds = max(0, Int(deadline.timeIntervalSinceNow.rounded(.up)))
         }
+        tagScanCountdownTimer = countdownTimer
+        RunLoop.main.add(countdownTimer, forMode: .common)
     }
 
-    /// 撳「停止掃描」,或者1分鐘逾時自動觸發:通知讀寫模組轉返`.idle`並取消逾時計時。
+    /// 人手停止或本地逾時：發送 .idle 並清除 App 計時狀態。
+    /// 真正停止與否仍需讀寫器回覆確認；現有 NUS 只回傳 EPC。
     func stopTagScan() {
         guard isTagScanning else { return }
         tagScanTimeoutTimer?.invalidate()
