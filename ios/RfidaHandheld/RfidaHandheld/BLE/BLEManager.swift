@@ -82,6 +82,10 @@ final class BLEManager: NSObject, ObservableObject {
             return
         }
         guard central.state == .poweredOn else { return }
+        // DeviceScanView每次重新出現(例如切換返其他tab再返嚟)都會喺onAppear撳呢個function,
+        // 若果嗰陣已經連接緊裝置,唔應該再開一次主動掃描 —— 掃描期間嘅無線電負載會干擾緊住嘅
+        // GATT連接,曾經導致「App顯示已連接,但實際上藍牙已經斷咗」。
+        guard !isConnected else { return }
         if reconnectAlreadyConnectedPeripheralIfNeeded() { return }
         discoveredDevices.removeAll()
         state = .scanning
