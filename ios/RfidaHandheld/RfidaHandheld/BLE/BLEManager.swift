@@ -67,6 +67,13 @@ final class BLEManager: NSObject, ObservableObject {
     private var tagScanCountdownTimer: Timer?
     private var tagScanDeadline: Date?
 
+    /// 標記使用者係咪主動撳「中斷連接」。之前無論邊種原因斷線,都要返首頁DeviceScanView
+    /// 先可以重新搵返裝置並連接 —— 但四大情景畫面切換tab期間BLE連接一旦斷咗(例如訊號短暫
+    /// 唔穩定),就會卡喺`.disconnected`,使用者要專登返去首頁先可以繼續用。而家淨係使用者
+    /// 自己撳「中斷連接」先當作預期斷線;其他情況(包括切tab嗰陣斷線)都會自動重連,
+    /// 唔使返去首頁,喺邊個情景畫面都會見到狀態自動變返`連接中…`→`已連接`。
+    private var explicitDisconnectRequested = false
+
     var isConnected: Bool {
         if case .connected = state { return true }
         return false
@@ -136,6 +143,7 @@ final class BLEManager: NSObject, ObservableObject {
             return
         }
         guard let peripheral = connectedPeripheral else { return }
+        explicitDisconnectRequested = true
         central.cancelPeripheralConnection(peripheral)
     }
 
@@ -290,8 +298,17 @@ extension BLEManager: CBCentralManagerDelegate {
         connectedPeripheral = nil
         rxCharacteristic = nil
         txCharacteristic = nil
-        state = .disconnected
         stopTagScan()
+        // 唔係使用者自己撳「中斷連接」嘅斷線(例如切tab期間訊號短暫唔穩定):即刻用返
+        // 同一個peripheral reference重新連接,唔使使用者專登返去首頁DeviceScanView先可以
+        // 重新搵返裝置。
+        guard explicitDisconnectRequested else {
+            state = .connecting
+            central.connect(peripheral, options: nil)
+            return
+        }
+        explicitDisconnectRequested = false
+        state = .disconnected
     }
 }
 
