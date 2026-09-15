@@ -11,6 +11,8 @@ struct CheckoutView: View {
             Form {
                 Section { ConnectionStatusBadge() }
 
+                TagScanControlButton(mode: .batch)
+
                 Section("選擇") {
                     Picker("員工", selection: $viewModel.selectedStaffId) {
                         Text("請選擇").tag(Int?.none)
@@ -69,10 +71,9 @@ struct CheckoutView: View {
             .navigationTitle("2. 出發前登記")
             .onAppear {
                 ble.onTagsRead = { reads in viewModel.handle(reads: reads) }
-                ble.send(mode: .batch)
             }
             .onDisappear {
-                ble.send(mode: .idle)
+                ble.stopTagScan()
                 ble.onTagsRead = nil
             }
         }
