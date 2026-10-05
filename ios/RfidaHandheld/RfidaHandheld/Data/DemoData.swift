@@ -12,10 +12,10 @@ enum DemoData {
         Equipment(id: 6, epc: "E2801160600002042BB8A1C6", name: "Manfrotto 三腳架", category: "支架", serialNumber: "SN-3001", status: .missing, lastSeenAt: Date()),
     ]
 
-    static let staff: [Staff] = [
-        Staff(id: 1, name: "陳大文"),
-        Staff(id: 2, name: "李小明"),
-        Staff(id: 3, name: "黃美玲"),
+    static let companies: [Company] = [
+        Company(id: 1, name: "陳大文攝影工作室"),
+        Company(id: 2, name: "李小明影像製作"),
+        Company(id: 3, name: "黃美玲活動策劃"),
     ]
 
     static let openJob = Job(id: 1, name: "2026-09-12 婚禮攝影(示範)", date: Date().addingTimeInterval(86_400), status: .open)

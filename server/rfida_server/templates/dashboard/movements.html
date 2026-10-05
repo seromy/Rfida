@@ -14,14 +14,14 @@
   {% if items %}
   <table>
     <thead>
-      <tr><th>時間</th><th>Job</th><th>員工</th><th>方向</th><th>EPC</th><th>備註</th></tr>
+      <tr><th>時間</th><th>Job</th><th>公司</th><th>方向</th><th>EPC</th><th>備註</th></tr>
     </thead>
     <tbody>
       {% for mv in items %}
       <tr>
         <td>{{ mv.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
         <td>{% if mv.job %}<a href="{{ url_for('dashboard.job_detail', job_id=mv.job.id) }}">{{ mv.job.name }}</a>{% else %}—{% endif %}</td>
-        <td>{{ mv.staff.name if mv.staff else '—' }}</td>
+        <td>{{ mv.company.name if mv.company else '—' }}</td>
         <td>{{ m.direction_badge(mv.direction) }}</td>
         <td>{{ m.epc_list(mv.epcs) }}
           {% if mv.missing_epcs %}<br><span class="badge badge-missing">缺件</span> {{ m.epc_list(mv.missing_epcs) }}{% endif %}

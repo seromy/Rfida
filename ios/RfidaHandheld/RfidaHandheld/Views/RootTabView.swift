@@ -7,16 +7,16 @@ struct RootTabView: View {
                 .tabItem { Label("首頁", systemImage: "house") }
 
             RegisterTagView()
-                .tabItem { Label("錄入標籤", systemImage: "tag.circle") }
+                .tabItem { Label("錄入新標籤", systemImage: "tag.circle") }
 
             CheckoutView()
-                .tabItem { Label("出Job登記", systemImage: "arrow.up.right.circle") }
+                .tabItem { Label("器材出庫", systemImage: "arrow.up.right.circle") }
 
             ReturnCheckView()
-                .tabItem { Label("歸還清點", systemImage: "arrow.down.left.circle") }
+                .tabItem { Label("器材入庫", systemImage: "arrow.down.left.circle") }
 
             InventoryView()
-                .tabItem { Label("定期盤點", systemImage: "list.bullet.clipboard") }
+                .tabItem { Label("庫存盤點", systemImage: "list.bullet.clipboard") }
         }
     }
 }

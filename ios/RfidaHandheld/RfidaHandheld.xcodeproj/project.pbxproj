@@ -18,19 +18,24 @@
 		32E04E6A3BFFF62E03514A12 /* DeviceScanView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2FEB388DAE1072A47E440C2 /* DeviceScanView.swift */; };
 		3CF281539EA7DBCF3AB4FB8A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9DCA121B40CA436A76F5791A /* Assets.xcassets */; };
 		45D0E508BB0B79A924C9AA6B /* BLEManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 329AAEC8F18EAA601AC2D699 /* BLEManager.swift */; };
-		AA11BB22CC33DD44EE55FF02 /* DemoData.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11BB22CC33DD44EE55FF01 /* DemoData.swift */; };
-		AA11BB22CC33DD44EE55FF04 /* DemoDataProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11BB22CC33DD44EE55FF03 /* DemoDataProvider.swift */; };
 		4B74DE75BE5B394DB28AA108 /* NUSProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4938B0BAA6C1D182E20BA4A /* NUSProtocol.swift */; };
 		70DC32585D69B54F98B8662E /* ReturnCheckView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 094EF1333037AE5FE509A6F8 /* ReturnCheckView.swift */; };
 		743FCF8A61C79CBD7E5ED3D3 /* InventoryModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C255E0C50DE7CA06837305E /* InventoryModels.swift */; };
 		785A8DC025DB336F21ADEE89 /* MultiTagWarningView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DD49E5415E2CBA12B428BF0 /* MultiTagWarningView.swift */; };
-		AA11BB22CC33DD44EE55FF10 /* TagScanControlButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11BB22CC33DD44EE55FF11 /* TagScanControlButton.swift */; };
 		85A38DE02BB770D1A9A63697 /* MasterDataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B37D71068C76C527F5681A10 /* MasterDataStore.swift */; };
 		9C6FB0550F111C280EFD9B0E /* ConnectionStatusBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20B00D2731061D9E1E9D9656 /* ConnectionStatusBadge.swift */; };
 		A1A51301332352638DFC81BE /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C07CA46C06F1C1168C5771 /* APIClient.swift */; };
 		A5547A6D37D372F30026A07A /* CheckoutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7BE7F6F8EE0A83E0F5DFA64 /* CheckoutView.swift */; };
-		ABB00CEC60DA37755834EB0C /* Staff.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4780815F7FDEC9460F56DC22 /* Staff.swift */; };
+		AA11BB22CC33DD44EE55FF02 /* DemoData.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11BB22CC33DD44EE55FF01 /* DemoData.swift */; };
+		AA11BB22CC33DD44EE55FF04 /* DemoDataProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11BB22CC33DD44EE55FF03 /* DemoDataProvider.swift */; };
+		AA11BB22CC33DD44EE55FF10 /* TagScanControlButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11BB22CC33DD44EE55FF11 /* TagScanControlButton.swift */; };
+		ABB00CEC60DA37755834EB0C /* Company.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4780815F7FDEC9460F56DC22 /* Company.swift */; };
 		B9579EA4A538D9305910F546 /* BLEDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 776971CE9652590BED9D8E9E /* BLEDevice.swift */; };
+		CC55AA0000000000000000A2 /* ReaderSessionModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC55AA0000000000000000A1 /* ReaderSessionModel.swift */; };
+		CC55AA0000000000000000A4 /* ReaderMessages.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC55AA0000000000000000A3 /* ReaderMessages.swift */; };
+		CC55AA0000000000000000B2 /* NUSLineParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC55AA0000000000000000B1 /* NUSLineParserTests.swift */; };
+		CC55AA0000000000000000B4 /* ReaderSessionModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC55AA0000000000000000B3 /* ReaderSessionModelTests.swift */; };
+		CC55AA0000000000000000B6 /* BLEManagerDemoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC55AA0000000000000000B5 /* BLEManagerDemoTests.swift */; };
 		D3985A19D75C95C5E49C5376 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB23538ECA6E287AA7437368 /* Constants.swift */; };
 		D4F366A80998CDCE16D7F89C /* InventoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24CE6951265770DECFAE1C9B /* InventoryView.swift */; };
 		DAC35DEBF841B7D4773F318B /* RootTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA786609EAFA0D0364DE5C92 /* RootTabView.swift */; };
@@ -43,6 +48,16 @@
 		FC822AA557C9D4379A59A7A0 /* RegisterTagView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB23CF4C209C70213D20B738 /* RegisterTagView.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		CC55AA0000000000000000C5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 02B84600269A33F27994289E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 38A8EFC51FFA7A3795071639;
+			remoteInfo = RfidaHandheld;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
 		02B720A3D1D7D02FA51E0D03 /* ReturnCheckViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReturnCheckViewModel.swift; sourceTree = "<group>"; };
 		094EF1333037AE5FE509A6F8 /* ReturnCheckView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReturnCheckView.swift; sourceTree = "<group>"; };
@@ -53,13 +68,10 @@
 		24CE6951265770DECFAE1C9B /* InventoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryView.swift; sourceTree = "<group>"; };
 		3091895DE9F8B7EE94EFD56D /* Bundle+Version.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Bundle+Version.swift"; sourceTree = "<group>"; };
 		329AAEC8F18EAA601AC2D699 /* BLEManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEManager.swift; sourceTree = "<group>"; };
-		AA11BB22CC33DD44EE55FF01 /* DemoData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoData.swift; sourceTree = "<group>"; };
-		AA11BB22CC33DD44EE55FF03 /* DemoDataProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoDataProvider.swift; sourceTree = "<group>"; };
-		4780815F7FDEC9460F56DC22 /* Staff.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Staff.swift; sourceTree = "<group>"; };
+		4780815F7FDEC9460F56DC22 /* Company.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Company.swift; sourceTree = "<group>"; };
 		4D9A55B22D60150F2D73621F /* InventoryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryViewModel.swift; sourceTree = "<group>"; };
 		56756B1CF51FF0A8EE93E3CD /* Equipment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Equipment.swift; sourceTree = "<group>"; };
 		5DD49E5415E2CBA12B428BF0 /* MultiTagWarningView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiTagWarningView.swift; sourceTree = "<group>"; };
-		AA11BB22CC33DD44EE55FF11 /* TagScanControlButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagScanControlButton.swift; sourceTree = "<group>"; };
 		6390CCF4E230217F01457D7F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		6D37B86E604E073AE01C53FC /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		751FC6CE3D28C8034716057E /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
@@ -70,12 +82,21 @@
 		9D10F215C28C58630E4AB8FE /* RfidaHandheldApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RfidaHandheldApp.swift; sourceTree = "<group>"; };
 		9DCA121B40CA436A76F5791A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A4B61398DC67FB57B1CD76BA /* RegisterTagViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterTagViewModel.swift; sourceTree = "<group>"; };
+		AA11BB22CC33DD44EE55FF01 /* DemoData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoData.swift; sourceTree = "<group>"; };
+		AA11BB22CC33DD44EE55FF03 /* DemoDataProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoDataProvider.swift; sourceTree = "<group>"; };
+		AA11BB22CC33DD44EE55FF11 /* TagScanControlButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagScanControlButton.swift; sourceTree = "<group>"; };
 		AA786609EAFA0D0364DE5C92 /* RootTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootTabView.swift; sourceTree = "<group>"; };
 		AB23538ECA6E287AA7437368 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		B37D71068C76C527F5681A10 /* MasterDataStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MasterDataStore.swift; sourceTree = "<group>"; };
 		B7A6EE6214F4F4C1C059843E /* ScanSoundPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanSoundPlayer.swift; sourceTree = "<group>"; };
 		BB23CF4C209C70213D20B738 /* RegisterTagView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterTagView.swift; sourceTree = "<group>"; };
 		C7BE7F6F8EE0A83E0F5DFA64 /* CheckoutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutView.swift; sourceTree = "<group>"; };
+		CC55AA0000000000000000A1 /* ReaderSessionModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReaderSessionModel.swift; sourceTree = "<group>"; };
+		CC55AA0000000000000000A3 /* ReaderMessages.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReaderMessages.swift; sourceTree = "<group>"; };
+		CC55AA0000000000000000B1 /* NUSLineParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NUSLineParserTests.swift; sourceTree = "<group>"; };
+		CC55AA0000000000000000B3 /* ReaderSessionModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReaderSessionModelTests.swift; sourceTree = "<group>"; };
+		CC55AA0000000000000000B5 /* BLEManagerDemoTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEManagerDemoTests.swift; sourceTree = "<group>"; };
+		CC55AA0000000000000000C0 /* RfidaHandheldTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RfidaHandheldTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D2FEB388DAE1072A47E440C2 /* DeviceScanView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceScanView.swift; sourceTree = "<group>"; };
 		DE754ED90BE3FEA545644641 /* TagRead.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagRead.swift; sourceTree = "<group>"; };
 		E4938B0BAA6C1D182E20BA4A /* NUSProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NUSProtocol.swift; sourceTree = "<group>"; };
@@ -90,6 +111,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		CC55AA0000000000000000C3 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -97,6 +125,7 @@
 			isa = PBXGroup;
 			children = (
 				6879D820C2CFFDC40AE14AA9 /* RfidaHandheld */,
+				CC55AA0000000000000000B0 /* RfidaHandheldTests */,
 				D250527E4DF2B556B2CC2E5E /* Products */,
 			);
 			sourceTree = "<group>";
@@ -105,7 +134,7 @@
 			isa = PBXGroup;
 			children = (
 				56756B1CF51FF0A8EE93E3CD /* Equipment.swift */,
-				4780815F7FDEC9460F56DC22 /* Staff.swift */,
+				4780815F7FDEC9460F56DC22 /* Company.swift */,
 				97059FD098DF0C5D7C44FE53 /* Job.swift */,
 				230FD97B4F41BC8898BE3C41 /* MovementModels.swift */,
 				8C255E0C50DE7CA06837305E /* InventoryModels.swift */,
@@ -139,6 +168,8 @@
 			children = (
 				E4938B0BAA6C1D182E20BA4A /* NUSProtocol.swift */,
 				329AAEC8F18EAA601AC2D699 /* BLEManager.swift */,
+				CC55AA0000000000000000A1 /* ReaderSessionModel.swift */,
+				CC55AA0000000000000000A3 /* ReaderMessages.swift */,
 			);
 			path = BLE;
 			sourceTree = "<group>";
@@ -186,10 +217,21 @@
 			path = Views;
 			sourceTree = "<group>";
 		};
+		CC55AA0000000000000000B0 /* RfidaHandheldTests */ = {
+			isa = PBXGroup;
+			children = (
+				CC55AA0000000000000000B1 /* NUSLineParserTests.swift */,
+				CC55AA0000000000000000B3 /* ReaderSessionModelTests.swift */,
+				CC55AA0000000000000000B5 /* BLEManagerDemoTests.swift */,
+			);
+			path = RfidaHandheldTests;
+			sourceTree = "<group>";
+		};
 		D250527E4DF2B556B2CC2E5E /* Products */ = {
 			isa = PBXGroup;
 			children = (
 				E59939D32FD9EF98DC6098D4 /* RfidaHandheld.app */,
+				CC55AA0000000000000000C0 /* RfidaHandheldTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -243,6 +285,24 @@
 			productReference = E59939D32FD9EF98DC6098D4 /* RfidaHandheld.app */;
 			productType = "com.apple.product-type.application";
 		};
+		CC55AA0000000000000000C1 /* RfidaHandheldTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CC55AA0000000000000000C7 /* Build configuration list for PBXNativeTarget "RfidaHandheldTests" */;
+			buildPhases = (
+				CC55AA0000000000000000C2 /* Sources */,
+				CC55AA0000000000000000C3 /* Frameworks */,
+				CC55AA0000000000000000C4 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				CC55AA0000000000000000C6 /* PBXTargetDependency */,
+			);
+			name = RfidaHandheldTests;
+			productName = RfidaHandheldTests;
+			productReference = CC55AA0000000000000000C0 /* RfidaHandheldTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -255,6 +315,10 @@
 				TargetAttributes = {
 					38A8EFC51FFA7A3795071639 = {
 						CreatedOnToolsVersion = 15.2;
+					};
+					CC55AA0000000000000000C1 = {
+						CreatedOnToolsVersion = 15.2;
+						TestTargetID = 38A8EFC51FFA7A3795071639;
 					};
 				};
 			};
@@ -272,6 +336,7 @@
 			projectRoot = "";
 			targets = (
 				38A8EFC51FFA7A3795071639 /* RfidaHandheld */,
+				CC55AA0000000000000000C1 /* RfidaHandheldTests */,
 			);
 		};
 /* End PBXProject section */
@@ -285,6 +350,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		CC55AA0000000000000000C4 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -294,7 +366,7 @@
 			files = (
 				240487B519D571AB44043DAE /* RfidaHandheldApp.swift in Sources */,
 				0E6700C464BC1CE4F17F24FA /* Equipment.swift in Sources */,
-				ABB00CEC60DA37755834EB0C /* Staff.swift in Sources */,
+				ABB00CEC60DA37755834EB0C /* Company.swift in Sources */,
 				1827877FC68A91B0B34DA84F /* Job.swift in Sources */,
 				DE88406920981DE5D3DAF778 /* MovementModels.swift in Sources */,
 				743FCF8A61C79CBD7E5ED3D3 /* InventoryModels.swift in Sources */,
@@ -302,6 +374,8 @@
 				B9579EA4A538D9305910F546 /* BLEDevice.swift in Sources */,
 				4B74DE75BE5B394DB28AA108 /* NUSProtocol.swift in Sources */,
 				45D0E508BB0B79A924C9AA6B /* BLEManager.swift in Sources */,
+				CC55AA0000000000000000A2 /* ReaderSessionModel.swift in Sources */,
+				CC55AA0000000000000000A4 /* ReaderMessages.swift in Sources */,
 				A1A51301332352638DFC81BE /* APIClient.swift in Sources */,
 				AA11BB22CC33DD44EE55FF04 /* DemoDataProvider.swift in Sources */,
 				85A38DE02BB770D1A9A63697 /* MasterDataStore.swift in Sources */,
@@ -328,7 +402,25 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		CC55AA0000000000000000C2 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CC55AA0000000000000000B2 /* NUSLineParserTests.swift in Sources */,
+				CC55AA0000000000000000B4 /* ReaderSessionModelTests.swift in Sources */,
+				CC55AA0000000000000000B6 /* BLEManagerDemoTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		CC55AA0000000000000000C6 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 38A8EFC51FFA7A3795071639 /* RfidaHandheld */;
+			targetProxy = CC55AA0000000000000000C5 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		28A2F3F73DB1931DF5421EFC /* Debug */ = {
@@ -404,6 +496,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "";
+				DEVELOPMENT_TEAM = U3MMTT9B5M;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = RfidaHandheld/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = "$(RECOMMENDED_IPHONEOS_DEPLOYMENT_TARGET)";
@@ -478,6 +571,42 @@
 			};
 			name = Release;
 		};
+		CC55AA0000000000000000C8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = "$(RECOMMENDED_IPHONEOS_DEPLOYMENT_TARGET)";
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.rfida.RfidaHandheldTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/RfidaHandheld.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/RfidaHandheld";
+			};
+			name = Debug;
+		};
+		CC55AA0000000000000000C9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = "$(RECOMMENDED_IPHONEOS_DEPLOYMENT_TARGET)";
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.rfida.RfidaHandheldTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/RfidaHandheld.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/RfidaHandheld";
+			};
+			name = Release;
+		};
 		F962B50EE3026D65223630C3 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -486,6 +615,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "";
+				DEVELOPMENT_TEAM = U3MMTT9B5M;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = RfidaHandheld/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = "$(RECOMMENDED_IPHONEOS_DEPLOYMENT_TARGET)";
@@ -519,6 +649,15 @@
 			buildConfigurations = (
 				64056630FAB5E6917E06AD68 /* Debug */,
 				F962B50EE3026D65223630C3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CC55AA0000000000000000C7 /* Build configuration list for PBXNativeTarget "RfidaHandheldTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CC55AA0000000000000000C8 /* Debug */,
+				CC55AA0000000000000000C9 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

@@ -2,7 +2,7 @@
 
 呢份文件定義 iOS App(`ios/RfidaHandheld`)期望嘅 Flask + SQLite 後台REST API。後台伺服器已按呢個合約實作喺 [`server/`](../server/)(見 [`server/README.md`](../server/README.md)),App已經按照呢個合約實作 networking layer(`Networking/APIClient.swift`)。如果實際實作有出入,對應調整 `server/` 或者App入面嘅路徑即可。
 
-方案書4.2:「業務邏輯(員工名單、Job名單、commit紀錄)一律經WiFi打去後台伺服器。」BLE只負責傳送EPC,所有資料查詢/提交都經呢度嘅API。
+方案書4.2:「業務邏輯(公司名單、Job名單、commit紀錄)一律經WiFi打去後台伺服器。」BLE只負責傳送EPC,所有資料查詢/提交都經呢度嘅API。
 
 Base URL 喺App「設定」畫面設定(例:`http://192.168.1.50:5000`),所有路徑都係相對呢個base URL。
 
@@ -32,10 +32,10 @@ Base URL 喺App「設定」畫面設定(例:`http://192.168.1.50:5000`),所有�
 
 `status` 為 `in_stock` / `checked_out` / `missing` 其中之一。
 
-## GET /api/staff
+## GET /api/company
 
 ```json
-[{ "id": 1, "name": "陳大文" }]
+[{ "id": 1, "name": "陳大文攝影工作室" }]
 ```
 
 ## GET /api/jobs?status=open
@@ -73,7 +73,7 @@ Base URL 喺App「設定」畫面設定(例:`http://192.168.1.50:5000`),所有�
 ```json
 {
   "jobId": 10,
-  "staffId": 1,
+  "companyId": 1,
   "direction": "out",
   "epcs": ["E2801160600002042BB8A1C3", "E2801160600002042BB8A1C4"],
   "missingEpcs": null,
@@ -93,7 +93,7 @@ Base URL 喺App「設定」畫面設定(例:`http://192.168.1.50:5000`),所有�
 請求:
 ```json
 {
-  "staffId": 1,
+  "companyId": 1,
   "batchLabel": "A區",
   "scannedEpcs": ["E2801160600002042BB8A1C3"],
   "timestamp": "2026-09-11T10:30:00Z"

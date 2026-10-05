@@ -4,11 +4,11 @@ from flask import Blueprint, jsonify, request
 
 from .extensions import db
 from .models import (
+    Company,
     Equipment,
     InventorySession,
     Job,
     Movement,
-    Staff,
     VALID_DIRECTIONS,
     utcnow,
 )
@@ -32,9 +32,9 @@ def list_equipment():
     return jsonify([item.to_dict() for item in items])
 
 
-@api_bp.get("/staff")
-def list_staff():
-    items = Staff.query.order_by(Staff.id).all()
+@api_bp.get("/company")
+def list_companies():
+    items = Company.query.order_by(Company.id).all()
     return jsonify([item.to_dict() for item in items])
 
 
@@ -101,7 +101,7 @@ def create_movement():
 
     movement = Movement(
         job_id=body.get("jobId"),
-        staff_id=body.get("staffId"),
+        company_id=body.get("companyId"),
         direction=direction,
         epcs=epcs,
         missing_epcs=missing_epcs,
@@ -147,7 +147,7 @@ def create_inventory_session():
             equipment.status = "in_stock"
 
     session = InventorySession(
-        staff_id=body.get("staffId"),
+        company_id=body.get("companyId"),
         batch_label=body.get("batchLabel") or "",
         scanned_epcs=scanned_epcs,
         unknown_epcs=unknown_epcs,

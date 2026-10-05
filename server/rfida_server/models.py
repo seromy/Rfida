@@ -42,8 +42,8 @@ class Equipment(db.Model):
         }
 
 
-class Staff(db.Model):
-    __tablename__ = "staff"
+class Company(db.Model):
+    __tablename__ = "company"
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200), nullable=False)
@@ -84,20 +84,20 @@ class Movement(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     job_id = db.Column(db.Integer, db.ForeignKey("jobs.id"), nullable=True)
-    staff_id = db.Column(db.Integer, db.ForeignKey("staff.id"), nullable=True)
+    company_id = db.Column(db.Integer, db.ForeignKey("company.id"), nullable=True)
     direction = db.Column(db.String(10), nullable=False)
     epcs = db.Column(db.JSON, nullable=False, default=list)
     missing_epcs = db.Column(db.JSON, nullable=True)
     note = db.Column(db.Text, nullable=True)
     created_at = db.Column(db.DateTime, nullable=False, default=utcnow)
 
-    staff = db.relationship("Staff")
+    company = db.relationship("Company")
 
     def to_dict(self):
         return {
             "id": self.id,
             "jobId": self.job_id,
-            "staffId": self.staff_id,
+            "companyId": self.company_id,
             "direction": self.direction,
             "epcs": self.epcs or [],
             "missingEpcs": self.missing_epcs,
@@ -110,19 +110,19 @@ class InventorySession(db.Model):
     __tablename__ = "inventory_sessions"
 
     id = db.Column(db.Integer, primary_key=True)
-    staff_id = db.Column(db.Integer, db.ForeignKey("staff.id"), nullable=True)
+    company_id = db.Column(db.Integer, db.ForeignKey("company.id"), nullable=True)
     batch_label = db.Column(db.String(100), nullable=False, default="")
     scanned_epcs = db.Column(db.JSON, nullable=False, default=list)
     unknown_epcs = db.Column(db.JSON, nullable=False, default=list)
     timestamp = db.Column(db.DateTime, nullable=False, default=utcnow)
     created_at = db.Column(db.DateTime, nullable=False, default=utcnow)
 
-    staff = db.relationship("Staff")
+    company = db.relationship("Company")
 
     def to_dict(self):
         return {
             "id": self.id,
-            "staffId": self.staff_id,
+            "companyId": self.company_id,
             "batchLabel": self.batch_label,
             "scannedEpcs": self.scanned_epcs or [],
             "unknownEpcs": self.unknown_epcs or [],

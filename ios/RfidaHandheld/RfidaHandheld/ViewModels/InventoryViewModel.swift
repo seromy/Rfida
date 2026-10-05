@@ -7,7 +7,7 @@ import Foundation
 final class InventoryViewModel: ObservableObject {
     static let tagBufferWarningThreshold = 180
 
-    @Published var selectedStaffId: Int?
+    @Published var selectedCompanyId: Int?
     @Published var batchLabel: String = ""
     @Published var scannedEPCs: Set<String> = []
     @Published var isSubmitting = false
@@ -41,13 +41,13 @@ final class InventoryViewModel: ObservableObject {
     }
 
     func submit() async {
-        guard let staffId = selectedStaffId else { lastError = "請先選擇員工"; return }
+        guard let companyId = selectedCompanyId else { lastError = "請先選擇公司"; return }
         guard !scannedEPCs.isEmpty else { lastError = "未掃描到任何標籤"; return }
         isSubmitting = true
         lastError = nil
         defer { isSubmitting = false }
         let submission = InventorySubmission(
-            staffId: staffId,
+            companyId: companyId,
             batchLabel: batchLabel.isEmpty ? "未命名批次" : batchLabel,
             scannedEpcs: Array(scannedEPCs),
             timestamp: Date()

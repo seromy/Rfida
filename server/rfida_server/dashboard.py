@@ -1,7 +1,7 @@
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 
 from .extensions import db
-from .models import Equipment, InventorySession, Job, Movement, Staff, utcnow
+from .models import Company, Equipment, InventorySession, Job, Movement, utcnow
 
 dashboard_bp = Blueprint("dashboard", __name__, template_folder="templates")
 
@@ -14,7 +14,7 @@ def index():
         "checked_out": Equipment.query.filter_by(status="checked_out").count(),
         "missing": Equipment.query.filter_by(status="missing").count(),
         "open_jobs": Job.query.filter_by(status="open").count(),
-        "staff": Staff.query.count(),
+        "company": Company.query.count(),
     }
     recent_movements = (
         Movement.query.order_by(Movement.created_at.desc()).limit(6).all()
@@ -101,31 +101,31 @@ def equipment_delete(equipment_id):
     return redirect(url_for("dashboard.equipment_list"))
 
 
-@dashboard_bp.get("/staff")
-def staff_list():
-    items = Staff.query.order_by(Staff.id.desc()).all()
-    return render_template("dashboard/staff.html", items=items)
+@dashboard_bp.get("/company")
+def company_list():
+    items = Company.query.order_by(Company.id.desc()).all()
+    return render_template("dashboard/company.html", items=items)
 
 
-@dashboard_bp.post("/staff")
-def staff_create():
+@dashboard_bp.post("/company")
+def company_create():
     name = request.form.get("name", "").strip()
     if not name:
-        flash("員工姓名為必填", "error")
-        return redirect(url_for("dashboard.staff_list"))
-    db.session.add(Staff(name=name))
+        flash("公司名稱為必填", "error")
+        return redirect(url_for("dashboard.company_list"))
+    db.session.add(Company(name=name))
     db.session.commit()
-    flash(f"已新增員工「{name}」", "success")
-    return redirect(url_for("dashboard.staff_list"))
+    flash(f"已新增公司「{name}」", "success")
+    return redirect(url_for("dashboard.company_list"))
 
 
-@dashboard_bp.post("/staff/<int:staff_id>/delete")
-def staff_delete(staff_id):
-    staff = Staff.query.get_or_404(staff_id)
-    db.session.delete(staff)
+@dashboard_bp.post("/company/<int:company_id>/delete")
+def company_delete(company_id):
+    company = Company.query.get_or_404(company_id)
+    db.session.delete(company)
     db.session.commit()
-    flash(f"已刪除員工「{staff.name}」", "success")
-    return redirect(url_for("dashboard.staff_list"))
+    flash(f"已刪除公司「{company.name}」", "success")
+    return redirect(url_for("dashboard.company_list"))
 
 
 @dashboard_bp.get("/jobs")

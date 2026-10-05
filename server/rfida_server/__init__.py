@@ -39,7 +39,7 @@ def create_app(test_config=None):
 def register_cli(app):
     @app.cli.command("seed-demo")
     def seed_demo():
-        """建立示範資料(器材/員工/Job),方便試用網頁 Dashboard。"""
+        """建立示範資料(器材/公司/Job),方便試用網頁 Dashboard。"""
         from .seed import seed_demo_data
 
         seed_demo_data()

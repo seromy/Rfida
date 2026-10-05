@@ -1,6 +1,6 @@
 # Rfida 後台伺服器(Flask + SQLite)
 
-RFID 器材出入管理系統嘅後台組件:提供 iPhone App 所需嘅 REST API(見 [`../docs/API_CONTRACT.md`](../docs/API_CONTRACT.md)),並附設一個網頁 Dashboard 俾辦公室同事用瀏覽器管理器材、員工、Job同查看出入/盤點紀錄。
+RFID 器材出入管理系統嘅後台組件:提供 iPhone App 所需嘅 REST API(見 [`../docs/API_CONTRACT.md`](../docs/API_CONTRACT.md)),並附設一個網頁 Dashboard 俾辦公室同事用瀏覽器管理器材、公司、Job同查看出入/盤點紀錄。
 
 網頁 Dashboard 視覺風格參考 Anthropic 官網嘅暖色系、留白、serif標題設計。
 
@@ -13,7 +13,7 @@ server/
   rfida_server/
     __init__.py             # App factory(create_app）
     extensions.py           # SQLAlchemy instance
-    models.py                # Equipment / Staff / Job / Movement / InventorySession
+    models.py                # Equipment / Company / Job / Movement / InventorySession
     api.py                   # REST API blueprint(/api/*，對應 API_CONTRACT.md）
     dashboard.py             # 網頁 Dashboard blueprint
     seed.py                  # 示範資料
@@ -49,7 +49,7 @@ FLASK_APP=run.py flask seed-demo
 | 方法 | 路徑 | 用途 |
 |---|---|---|
 | GET | `/api/equipment` | 器材主檔清單 |
-| GET | `/api/staff` | 員工清單 |
+| GET | `/api/company` | 公司清單 |
 | GET | `/api/jobs?status=open` | Job清單(可用status篩選) |
 | GET | `/api/jobs/{jobId}/expected-items` | 情景3專用:該Job出Job時帶走嘅器材 |
 | POST | `/api/equipment/register` | 情景1專用:登記新EPC |
@@ -63,7 +63,7 @@ FLASK_APP=run.py flask seed-demo
 - `/jobs`、`/jobs/<id>`:Job清單、建立/結束Job、查看應有清單同出入紀錄(App假設Job CRUD由呢個Dashboard負責,見 API_CONTRACT.md「尚未涵蓋」一節)
 - `/movements`:所有出入紀錄
 - `/inventory-sessions`:所有盤點批次紀錄(標示未知EPC)
-- `/staff`:員工名單管理
+- `/company`:公司名單管理
 
 ## 已知限制
 

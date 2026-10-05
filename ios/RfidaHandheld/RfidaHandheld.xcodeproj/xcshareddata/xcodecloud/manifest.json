@@ -1,0 +1,9 @@
+{
+  "id" : "0bd0d708-04e7-4d6b-8f00-e71ae9ac59f1",
+  "targets" : [
+    {
+      "id" : "eef597f4-e80d-457a-bfdc-35fc602f2cb6",
+      "name" : "RfidaHandheld"
+    }
+  ]
+}

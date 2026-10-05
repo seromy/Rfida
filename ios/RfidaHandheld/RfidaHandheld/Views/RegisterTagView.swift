@@ -19,7 +19,7 @@ struct RegisterTagView: View {
                     }
                 }
 
-                Section("偵測到嘅標籤") {
+                Section("偵測到的標籤") {
                     if viewModel.detectedEPCs.isEmpty {
                         Text("請將一件器材放近讀寫頭…").foregroundStyle(.secondary)
                     } else {
@@ -35,8 +35,8 @@ struct RegisterTagView: View {
                 }
 
                 Section("器材資料") {
-                    TextField("名稱(例:Sony A7IV 機身)", text: $viewModel.name)
-                    TextField("分類(例:機身/鏡頭/腳架)", text: $viewModel.category)
+                    TextField("名稱", text: $viewModel.name)
+                    TextField("分類", text: $viewModel.category)
                     TextField("序號(選填)", text: $viewModel.serialNumber)
                 }
                 .disabled(viewModel.singleDetectedEPC == nil)
@@ -61,14 +61,13 @@ struct RegisterTagView: View {
                     Text(error).foregroundStyle(.red)
                 }
             }
-            .navigationTitle("1. 錄入新標籤")
+            .navigationTitle("錄入新標籤")
             .onAppear {
                 viewModel.updateKnownEPCs(Set(masterData.equipment.map { $0.epc.uppercased() }))
-                ble.onTagsRead = { reads in viewModel.handle(reads: reads) }
+                ble.setTagReadHandler(owner: viewModel) { reads in viewModel.handle(reads: reads) }
             }
             .onDisappear {
-                ble.stopTagScan()
-                ble.onTagsRead = nil
+                ble.removeTagReadHandler(owner: viewModel)
             }
         }
     }

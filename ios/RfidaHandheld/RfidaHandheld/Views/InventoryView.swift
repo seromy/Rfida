@@ -14,10 +14,10 @@ struct InventoryView: View {
                 TagScanControlButton(mode: .batch)
 
                 Section("盤點批次") {
-                    Picker("員工", selection: $viewModel.selectedStaffId) {
+                    Picker("公司", selection: $viewModel.selectedCompanyId) {
                         Text("請選擇").tag(Int?.none)
-                        ForEach(masterData.staff) { staff in
-                            Text(staff.name).tag(Optional(staff.id))
+                        ForEach(masterData.companies) { company in
+                            Text(company.name).tag(Optional(company.id))
                         }
                     }
                     TextField("批次標籤(例:A區、鏡頭櫃)", text: $viewModel.batchLabel)
@@ -59,13 +59,12 @@ struct InventoryView: View {
                     Text(error).foregroundStyle(.red)
                 }
             }
-            .navigationTitle("4. 定期盤點")
+            .navigationTitle("庫存盤點")
             .onAppear {
-                ble.onTagsRead = { reads in viewModel.handle(reads: reads) }
+                ble.setTagReadHandler(owner: viewModel) { reads in viewModel.handle(reads: reads) }
             }
             .onDisappear {
-                ble.stopTagScan()
-                ble.onTagsRead = nil
+                ble.removeTagReadHandler(owner: viewModel)
             }
         }
     }

@@ -4,7 +4,7 @@ import Foundation
 /// 防漏讀重要過防多讀」,所以呢度只做批量累積,唔做單/多標籤警告。
 @MainActor
 final class CheckoutViewModel: ObservableObject {
-    @Published var selectedStaffId: Int?
+    @Published var selectedCompanyId: Int?
     @Published var selectedJobId: Int?
     @Published var scannedEPCs: [String] = []
     @Published var isSubmitting = false
@@ -33,8 +33,8 @@ final class CheckoutViewModel: ObservableObject {
     }
 
     func submit() async {
-        guard let staffId = selectedStaffId else {
-            lastError = "請先選擇員工"; return
+        guard let companyId = selectedCompanyId else {
+            lastError = "請先選擇公司"; return
         }
         guard let jobId = selectedJobId else {
             lastError = "請先選擇 Job"; return
@@ -45,7 +45,7 @@ final class CheckoutViewModel: ObservableObject {
         isSubmitting = true
         lastError = nil
         defer { isSubmitting = false }
-        let submission = MovementSubmission(jobId: jobId, staffId: staffId, direction: .out, epcs: scannedEPCs, missingEpcs: nil, note: nil)
+        let submission = MovementSubmission(jobId: jobId, companyId: companyId, direction: .out, epcs: scannedEPCs, missingEpcs: nil, note: nil)
         do {
             try await api.submitMovement(submission)
             lastMessage = "已提交出Job紀錄,共 \(scannedEPCs.count) 件器材"

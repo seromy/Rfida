@@ -12,7 +12,7 @@ struct MovementItem: Codable, Hashable {
 
 struct MovementSubmission: Codable {
     var jobId: Int
-    var staffId: Int
+    var companyId: Int
     var direction: MovementDirection
     var epcs: [String]
     var missingEpcs: [String]?

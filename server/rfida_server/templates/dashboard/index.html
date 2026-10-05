@@ -32,8 +32,8 @@
     <div class="stat-label">進行中 Job</div>
   </div>
   <div class="stat-card">
-    <div class="stat-value">{{ stats.staff }}</div>
-    <div class="stat-label">員工人數</div>
+    <div class="stat-value">{{ stats.company }}</div>
+    <div class="stat-label">公司數量</div>
   </div>
 </div>
 
@@ -46,14 +46,14 @@
     {% if recent_movements %}
       <table>
         <thead>
-          <tr><th>時間</th><th>Job</th><th>員工</th><th>方向</th><th>數量</th></tr>
+          <tr><th>時間</th><th>Job</th><th>公司</th><th>方向</th><th>數量</th></tr>
         </thead>
         <tbody>
           {% for mv in recent_movements %}
           <tr>
             <td>{{ mv.created_at.strftime('%m/%d %H:%M') }}</td>
             <td>{{ mv.job.name if mv.job else '—' }}</td>
-            <td>{{ mv.staff.name if mv.staff else '—' }}</td>
+            <td>{{ mv.company.name if mv.company else '—' }}</td>
             <td>{{ m.direction_badge(mv.direction) }}</td>
             <td>{{ (mv.epcs or [])|length }}</td>
           </tr>

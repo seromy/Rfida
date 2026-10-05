@@ -54,9 +54,9 @@ actor APIClient {
         return try await get("/api/equipment")
     }
 
-    func fetchStaff() async throws -> [Staff] {
-        if isDemoMode { return await DemoDataProvider.shared.fetchStaff() }
-        return try await get("/api/staff")
+    func fetchCompanies() async throws -> [Company] {
+        if isDemoMode { return await DemoDataProvider.shared.fetchCompanies() }
+        return try await get("/api/company")
     }
 
     func fetchOpenJobs() async throws -> [Job] {

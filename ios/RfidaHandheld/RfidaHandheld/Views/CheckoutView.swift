@@ -14,10 +14,10 @@ struct CheckoutView: View {
                 TagScanControlButton(mode: .batch)
 
                 Section("選擇") {
-                    Picker("員工", selection: $viewModel.selectedStaffId) {
+                    Picker("公司", selection: $viewModel.selectedCompanyId) {
                         Text("請選擇").tag(Int?.none)
-                        ForEach(masterData.staff) { staff in
-                            Text(staff.name).tag(Optional(staff.id))
+                        ForEach(masterData.companies) { company in
+                            Text(company.name).tag(Optional(company.id))
                         }
                     }
                     Picker("Job", selection: $viewModel.selectedJobId) {
@@ -68,13 +68,12 @@ struct CheckoutView: View {
                     Text(error).foregroundStyle(.red)
                 }
             }
-            .navigationTitle("2. 出發前登記")
+            .navigationTitle("器材出庫")
             .onAppear {
-                ble.onTagsRead = { reads in viewModel.handle(reads: reads) }
+                ble.setTagReadHandler(owner: viewModel) { reads in viewModel.handle(reads: reads) }
             }
             .onDisappear {
-                ble.stopTagScan()
-                ble.onTagsRead = nil
+                ble.removeTagReadHandler(owner: viewModel)
             }
         }
     }

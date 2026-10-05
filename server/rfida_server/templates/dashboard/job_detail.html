@@ -27,12 +27,12 @@
     <h2>出入紀錄</h2>
     {% if movements %}
       <table>
-        <thead><tr><th>時間</th><th>員工</th><th>方向</th><th>EPC</th></tr></thead>
+        <thead><tr><th>時間</th><th>公司</th><th>方向</th><th>EPC</th></tr></thead>
         <tbody>
           {% for mv in movements %}
           <tr>
             <td>{{ mv.created_at.strftime('%m/%d %H:%M') }}</td>
-            <td>{{ mv.staff.name if mv.staff else '—' }}</td>
+            <td>{{ mv.company.name if mv.company else '—' }}</td>
             <td>{{ m.direction_badge(mv.direction) }}</td>
             <td>{{ m.epc_list(mv.epcs) }}</td>
           </tr>

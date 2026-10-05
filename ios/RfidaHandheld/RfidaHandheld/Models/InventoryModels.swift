@@ -1,7 +1,7 @@
 import Foundation
 
 struct InventorySubmission: Codable {
-    var staffId: Int
+    var companyId: Int
     var batchLabel: String
     var scannedEpcs: [String]
     var timestamp: Date

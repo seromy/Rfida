@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 
 from .extensions import db
-from .models import Equipment, Job, Movement, Staff, utcnow
+from .models import Company, Equipment, Job, Movement, utcnow
 
 DEMO_EQUIPMENT = [
     ("E2801160600002042BB8A1C1", "Sony A7IV 機身", "機身", "SN-0001", "in_stock"),
@@ -12,16 +12,16 @@ DEMO_EQUIPMENT = [
     ("E2801160600002042BB8A1C6", "Manfrotto 三腳架", "支架", "SN-3001", "missing"),
 ]
 
-DEMO_STAFF = ["陳大文", "李小明", "黃美玲"]
+DEMO_COMPANIES = ["陳大文攝影工作室", "李小明影像製作", "黃美玲活動策劃"]
 
 
 def seed_demo_data():
-    if Equipment.query.first() or Staff.query.first():
+    if Equipment.query.first() or Company.query.first():
         print("資料庫已有資料,略過建立示範資料。")
         return
 
-    staff_objs = [Staff(name=name) for name in DEMO_STAFF]
-    db.session.add_all(staff_objs)
+    company_objs = [Company(name=name) for name in DEMO_COMPANIES]
+    db.session.add_all(company_objs)
 
     for epc, name, category, serial, status in DEMO_EQUIPMENT:
         db.session.add(
@@ -43,7 +43,7 @@ def seed_demo_data():
     db.session.add(
         Movement(
             job_id=job_open.id,
-            staff_id=staff_objs[0].id,
+            company_id=company_objs[0].id,
             direction="out",
             epcs=[
                 "E2801160600002042BB8A1C2",
@@ -55,7 +55,7 @@ def seed_demo_data():
     db.session.add(
         Movement(
             job_id=job_closed.id,
-            staff_id=staff_objs[1].id,
+            company_id=company_objs[1].id,
             direction="out",
             epcs=["E2801160600002042BB8A1C6"],
         )
@@ -63,7 +63,7 @@ def seed_demo_data():
     db.session.add(
         Movement(
             job_id=job_closed.id,
-            staff_id=staff_objs[1].id,
+            company_id=company_objs[1].id,
             direction="in",
             epcs=[],
             missing_epcs=["E2801160600002042BB8A1C6"],

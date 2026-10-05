@@ -19,7 +19,7 @@
         <a href="{{ url_for('dashboard.job_list') }}" class="{{ 'active' if request.endpoint in ['dashboard.job_list', 'dashboard.job_detail'] }}">Job</a>
         <a href="{{ url_for('dashboard.movement_list') }}" class="{{ 'active' if request.endpoint == 'dashboard.movement_list' }}">出入紀錄</a>
         <a href="{{ url_for('dashboard.inventory_session_list') }}" class="{{ 'active' if request.endpoint == 'dashboard.inventory_session_list' }}">盤點紀錄</a>
-        <a href="{{ url_for('dashboard.staff_list') }}" class="{{ 'active' if request.endpoint == 'dashboard.staff_list' }}">員工</a>
+        <a href="{{ url_for('dashboard.company_list') }}" class="{{ 'active' if request.endpoint == 'dashboard.company_list' }}">公司</a>
       </div>
     </div>
   </nav>

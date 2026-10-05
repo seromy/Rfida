@@ -9,7 +9,7 @@ actor DemoDataProvider {
     private var expectedItemsByJob: [Int: [MovementItem]] = [DemoData.openJob.id: DemoData.openJobExpectedItems]
 
     func fetchEquipment() -> [Equipment] { equipment }
-    func fetchStaff() -> [Staff] { DemoData.staff }
+    func fetchCompanies() -> [Company] { DemoData.companies }
     func fetchOpenJobs() -> [Job] { [DemoData.openJob] }
     func fetchExpectedItems(jobId: Int) -> [MovementItem] { expectedItemsByJob[jobId] ?? [] }
 

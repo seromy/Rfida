@@ -4,7 +4,7 @@ import Foundation
 /// 同「而家掃到」自動比對,揪出缺件 —— 方案書7.4標註呢個功能原本未實作,建議加。
 @MainActor
 final class ReturnCheckViewModel: ObservableObject {
-    @Published var selectedStaffId: Int?
+    @Published var selectedCompanyId: Int?
     /// 轉揀另一個Job時清空舊嘅應有清單同掃描結果,避免用戶漏撳「讀取應有清單」
     /// 而將舊Job嘅比對結果誤當做新Job提交(核心功能7.4嘅正確性保障)。
     @Published var selectedJobId: Int? {
@@ -69,12 +69,12 @@ final class ReturnCheckViewModel: ObservableObject {
 
     func submit() async {
         guard let jobId = selectedJobId else { lastError = "請先選擇 Job"; return }
-        guard let staffId = selectedStaffId else { lastError = "請先選擇員工"; return }
+        guard let companyId = selectedCompanyId else { lastError = "請先選擇公司"; return }
         isSubmitting = true
         lastError = nil
         defer { isSubmitting = false }
         let missingEPCs = diff.missing.map { $0.epc }
-        let submission = MovementSubmission(jobId: jobId, staffId: staffId, direction: .inbound, epcs: Array(scannedEPCs), missingEpcs: missingEPCs, note: nil)
+        let submission = MovementSubmission(jobId: jobId, companyId: companyId, direction: .inbound, epcs: Array(scannedEPCs), missingEpcs: missingEPCs, note: nil)
         do {
             try await api.submitMovement(submission)
             lastMessage = missingEPCs.isEmpty ? "器材已全部歸還" : "已提交,缺少 \(missingEPCs.count) 件器材"

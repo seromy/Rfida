@@ -21,7 +21,7 @@ struct HomeView: View {
 
                 Section("資料概況") {
                     LabeledContent("器材總數", value: "\(masterData.equipment.count)")
-                    LabeledContent("員工人數", value: "\(masterData.staff.count)")
+                    LabeledContent("公司數量", value: "\(masterData.companies.count)")
                     LabeledContent("進行中 Job", value: "\(masterData.openJobs.count)")
                     if masterData.isLoading {
                         ProgressView()

@@ -15,14 +15,14 @@
   {% if items %}
   <table>
     <thead>
-      <tr><th>時間</th><th>批次</th><th>員工</th><th>掃描數量</th><th>未知標籤</th></tr>
+      <tr><th>時間</th><th>批次</th><th>公司</th><th>掃描數量</th><th>未知標籤</th></tr>
     </thead>
     <tbody>
       {% for s in items %}
       <tr>
         <td>{{ s.timestamp.strftime('%Y-%m-%d %H:%M') }}</td>
         <td>{{ s.batch_label or '—' }}</td>
-        <td>{{ s.staff.name if s.staff else '—' }}</td>
+        <td>{{ s.company.name if s.company else '—' }}</td>
         <td>{{ (s.scanned_epcs or [])|length }}</td>
         <td>
           {% if s.unknown_epcs %}
