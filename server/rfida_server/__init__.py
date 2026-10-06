@@ -30,10 +30,30 @@ def create_app(test_config=None):
 
     with app.app_context():
         db.create_all()
+        add_missing_columns()
 
     register_cli(app)
 
     return app
+
+
+def add_missing_columns():
+    """create_all() 不會修改舊表格,所以幫舊資料庫補上新欄位。"""
+    from sqlalchemy import inspect, text
+
+    inspector = inspect(db.engine)
+    for table in db.metadata.sorted_tables:
+        if not inspector.has_table(table.name):
+            continue
+        existing = {c["name"] for c in inspector.get_columns(table.name)}
+        for column in table.columns:
+            if column.name in existing:
+                continue
+            col_type = column.type.compile(dialect=db.engine.dialect)
+            db.session.execute(
+                text(f'ALTER TABLE "{table.name}" ADD COLUMN "{column.name}" {col_type}')
+            )
+    db.session.commit()
 
 
 def register_cli(app):
