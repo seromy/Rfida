@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% import "_components.html" as c with context %}
+{% set editing = company is not none %}
+{% block title %}{{ '編輯公司' if editing else '新增公司' }}{% endblock %}
+{% block content %}
+{{ c.page_header(
+    ('編輯 ' ~ company.name) if editing else '新增公司',
+    ('編號 ' ~ company.doc_no) if editing else None,
+    [('首頁', url_for('dashboard.index')), ('公司', url_for('dashboard.company_list'))] + ([(company.name, url_for('dashboard.company_detail', company_id=company.id)), ('編輯', None)] if editing else [('新增', None)])) }}
+
+<div class="page-body">
+  <form method="post" novalidate>
+    {{ c.csrf() }}
+    {{ c.message_strip('error', errors, '未能儲存,請修正以下問題:') }}
+    <section class="panel">
+      <div class="panel-head"><h2 class="panel-title">公司資料</h2></div>
+      <div class="panel-body">
+        <div class="form-grid">
+          <div class="field-full">{{ c.field('name', '公司名稱', form.name, required=True, placeholder='陳大文攝影工作室', maxlength=200, autofocus=True) }}</div>
+          {{ c.field('contact_name', '聯絡人', form.contact_name, maxlength=100) }}
+          {{ c.field('phone', '電話', form.phone, type='tel', maxlength=50) }}
+          {{ c.field('email', '電郵', form.email, type='email', maxlength=120) }}
+          <div class="field field-full">
+            <label for="f-note">備註</label>
+            <textarea id="f-note" name="note" maxlength="2000">{{ form.note }}</textarea>
+          </div>
+        </div>
+      </div>
+    </section>
+    <div class="form-footer">
+      <a class="btn btn-ghost" href="{{ url_for('dashboard.company_detail', company_id=company.id) if editing else url_for('dashboard.company_list') }}">取消</a>
+      <button type="submit" class="btn btn-primary">{{ '儲存' if editing else '新增' }}</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

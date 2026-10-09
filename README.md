@@ -9,7 +9,7 @@ RFID 器材出入管理系統 —— 攝影器材出入/盤點自動化,自行�
 方案書入面嘅系統由硬件(YRM100 UHF讀寫模組 + ESP32)、韌體、iPhone App,到後台伺服器(Flask + SQLite)組成。本repo目前包含:
 
 - **`ios/`** —— iPhone App(Swift、SwiftUI、CoreBluetooth),作為RFID手提機嘅「畫面」,涵蓋四大使用情景(錄入新標籤、出發前登記、返office前清點、定期盤點)。詳見 [`ios/README.md`](ios/README.md)。
-- **`server/`** —— 後台伺服器(Flask + SQLite),提供App所需嘅REST API,以及一個Anthropic風格嘅網頁Dashboard,俾辦公室同事管理器材、公司、Job同查看出入/盤點紀錄。詳見 [`server/README.md`](server/README.md)。
+- **`server/`** —— 後台伺服器(Flask + SQLite),提供App所需嘅REST API,以及一個SAP Fiori風格嘅網頁後台,俾辦公室同事管理器材主檔、公司、Job、**器材借出服務**,同查看出入/盤點/變更紀錄。詳見 [`server/README.md`](server/README.md)。
 - **`docs/`** —— App對外依賴嘅介面合約文件:
   - [`docs/BLE_PROTOCOL.md`](docs/BLE_PROTOCOL.md):App同ESP32韌體之間嘅BLE(Nordic UART Service)通訊協議。
   - [`docs/API_CONTRACT.md`](docs/API_CONTRACT.md):App同Flask後台伺服器之間嘅REST API合約。

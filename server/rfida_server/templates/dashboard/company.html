@@ -1,45 +1,61 @@
 {% extends "base.html" %}
+{% import "_components.html" as c with context %}
 {% block title %}公司{% endblock %}
 {% block content %}
+{% call c.page_header('公司', '客戶同借用單位', [('首頁', url_for('dashboard.index')), ('公司', None)]) %}
+  <a class="btn btn-primary" href="{{ url_for('dashboard.company_create') }}">{{ c.icon('plus') }}新增公司</a>
+{% endcall %}
 
-<div class="page-header">
-  <div>
-    <div class="eyebrow">客戶名單</div>
-    <h1>公司</h1>
-  </div>
-</div>
-
-<div class="card">
-  <h3>新增公司</h3>
-  <form method="post" action="{{ url_for('dashboard.company_create') }}" class="form-inline">
-    <div class="field">
-      <label for="name">公司名稱</label>
-      <input type="text" id="name" name="name" placeholder="陳大文攝影工作室" required>
+<div class="page-body">
+  <form class="filterbar" method="get" role="search" aria-label="公司篩選">
+    <div class="filter-grid">
+      <div class="field field-wide">
+        <label for="f-q">搜尋</label>
+        <input type="search" id="f-q" name="q" value="{{ q }}" placeholder="公司名稱 / 聯絡人 / 電話 / 電郵">
+      </div>
+      <div class="filter-actions">
+        <button class="btn btn-primary" type="submit">{{ c.icon('search') }}查詢</button>
+        <a class="btn btn-ghost" href="{{ url_for('dashboard.company_list') }}">{{ c.icon('reset') }}重設</a>
+      </div>
     </div>
-    <button class="btn" type="submit">新增</button>
   </form>
-</div>
 
-<div class="card card-flush">
-  {% if items %}
-  <table>
-    <thead><tr><th>公司名稱</th><th></th></tr></thead>
-    <tbody>
-      {% for c in items %}
-      <tr>
-        <td>{{ c.name }}</td>
-        <td style="text-align:right;">
-          <form method="post" action="{{ url_for('dashboard.company_delete', company_id=c.id) }}" onsubmit="return confirm('確定刪除「{{ c.name }}」?');">
-            <button class="btn btn-ghost btn-sm" type="submit">刪除</button>
-          </form>
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-  {% else %}
-    <div class="empty-state">未有公司紀錄</div>
-  {% endif %}
+  <section class="panel" aria-labelledby="list-title">
+    <div class="panel-head"><h2 class="panel-title" id="list-title">公司清單 <span class="panel-count">({{ page.total }})</span></h2></div>
+    {% if items %}
+    <div class="table-wrap">
+      <table class="data">
+        <thead>
+          <tr>
+            {{ c.sort_th('id', '編號', sort, dir) }}
+            {{ c.sort_th('name', '公司名稱', sort, dir) }}
+            {{ c.sort_th('contact', '聯絡人', sort, dir) }}
+            <th scope="col">電話</th>
+            <th scope="col">電郵</th>
+            <th scope="col" class="num">未完結借出單</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for co in items %}
+          {% set open_loans = co.loans|selectattr('is_open')|list %}
+          <tr data-href="{{ url_for('dashboard.company_detail', company_id=co.id) }}">
+            <td class="nowrap">{{ co.doc_no }}</td>
+            <td><a class="row-link" href="{{ url_for('dashboard.company_detail', company_id=co.id) }}">{{ co.name }}</a></td>
+            <td>{{ co.contact_name or '—' }}</td>
+            <td class="nowrap">{{ co.phone or '—' }}</td>
+            <td>{{ co.email or '—' }}</td>
+            <td class="num">{{ open_loans|length }}{% if open_loans|selectattr('is_overdue')|list %} {{ c.status('negative', '逾期') }}{% endif %}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {{ c.pagination(page) }}
+    {% else %}
+      {% call c.empty('未有公司紀錄', '新增公司後,就可以喺借出單同出入紀錄揀選。', 'building') %}
+        <a class="btn btn-primary" href="{{ url_for('dashboard.company_create') }}">新增公司</a>
+      {% endcall %}
+    {% endif %}
+  </section>
 </div>
-
 {% endblock %}

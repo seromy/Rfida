@@ -1,44 +1,72 @@
 {% extends "base.html" %}
-{% import "_macros.html" as m %}
+{% import "_components.html" as c with context %}
 {% block title %}盤點紀錄{% endblock %}
 {% block content %}
+{{ c.page_header('盤點紀錄', '「未知標籤」代表主檔未登記嘅 EPC', [('首頁', url_for('dashboard.index')), ('盤點紀錄', None)]) }}
 
-<div class="page-header">
-  <div>
-    <div class="eyebrow">定期盤點</div>
-    <h1>盤點紀錄</h1>
-    <p>「未知標籤」代表主檔未登記嘅EPC。</p>
-  </div>
+<div class="page-body">
+  <form class="filterbar" method="get" role="search" aria-label="盤點紀錄篩選">
+    <div class="filter-grid">
+      <div class="field field-wide">
+        <label for="f-q">搜尋</label>
+        <input type="search" id="f-q" name="q" value="{{ q }}" placeholder="單號 / 批次名稱">
+      </div>
+      <div class="field">
+        <label for="f-company_id">公司</label>
+        <select id="f-company_id" name="company_id">
+          <option value="">全部</option>
+          {% for co in companies %}<option value="{{ co.id }}" {{ 'selected' if company_id == co.id|string }}>{{ co.name }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="field"><label for="f-date_from">由</label><input type="date" id="f-date_from" name="date_from" value="{{ date_from }}"></div>
+      <div class="field"><label for="f-date_to">至</label><input type="date" id="f-date_to" name="date_to" value="{{ date_to }}"></div>
+      <div class="field">
+        <label for="f-unknown">未知標籤</label>
+        <select id="f-unknown" name="unknown">
+          <option value="">全部</option>
+          <option value="1" {{ 'selected' if unknown }}>只顯示有未知標籤</option>
+        </select>
+      </div>
+      <div class="filter-actions">
+        <button class="btn btn-primary" type="submit">{{ c.icon('search') }}查詢</button>
+        <a class="btn btn-ghost" href="{{ url_for('dashboard.inventory_list') }}">{{ c.icon('reset') }}重設</a>
+      </div>
+    </div>
+  </form>
+
+  <section class="panel" aria-labelledby="list-title">
+    <div class="panel-head"><h2 class="panel-title" id="list-title">盤點批次 <span class="panel-count">({{ page.total }})</span></h2></div>
+    {% if items %}
+    <div class="table-wrap">
+      <table class="data">
+        <thead>
+          <tr>
+            {{ c.sort_th('id', '單號', sort, dir) }}
+            {{ c.sort_th('time', '時間', sort, dir) }}
+            {{ c.sort_th('batch', '批次', sort, dir) }}
+            <th scope="col">公司</th>
+            <th scope="col" class="num">掃描</th>
+            <th scope="col" class="num">未知標籤</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for s in items %}
+          <tr data-href="{{ url_for('dashboard.inventory_detail', session_id=s.id) }}">
+            <td class="nowrap"><a class="row-link" href="{{ url_for('dashboard.inventory_detail', session_id=s.id) }}">{{ s.doc_no }}</a></td>
+            <td class="nowrap tnum">{{ s.timestamp|ldt }}</td>
+            <td>{{ s.batch_label or '—' }}</td>
+            <td>{{ s.company.name if s.company else '—' }}</td>
+            <td class="num">{{ (s.scanned_epcs or [])|length }}</td>
+            <td class="num">{% if s.unknown_epcs %}{{ c.status('critical', s.unknown_epcs|length) }}{% else %}0{% endif %}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {{ c.pagination(page) }}
+    {% else %}
+      {% call c.empty('搵唔到盤點紀錄', '手提機完成盤點並提交後,會顯示喺度。', 'clipboard') %}<a class="btn" href="{{ url_for('dashboard.inventory_list') }}">清除篩選</a>{% endcall %}
+    {% endif %}
+  </section>
 </div>
-
-<div class="card card-flush">
-  {% if items %}
-  <table>
-    <thead>
-      <tr><th>時間</th><th>批次</th><th>公司</th><th>掃描數量</th><th>未知標籤</th></tr>
-    </thead>
-    <tbody>
-      {% for s in items %}
-      <tr>
-        <td>{{ s.timestamp.strftime('%Y-%m-%d %H:%M') }}</td>
-        <td>{{ s.batch_label or '—' }}</td>
-        <td>{{ s.company.name if s.company else '—' }}</td>
-        <td>{{ (s.scanned_epcs or [])|length }}</td>
-        <td>
-          {% if s.unknown_epcs %}
-            <span class="badge badge-missing">{{ s.unknown_epcs|length }}</span>
-            {{ m.epc_list(s.unknown_epcs) }}
-          {% else %}
-            <span class="text-muted">—</span>
-          {% endif %}
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-  {% else %}
-    <div class="empty-state">未有盤點紀錄</div>
-  {% endif %}
-</div>
-
 {% endblock %}

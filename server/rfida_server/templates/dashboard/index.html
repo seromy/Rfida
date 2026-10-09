@@ -1,103 +1,176 @@
 {% extends "base.html" %}
-{% import "_macros.html" as m %}
-{% block title %}總覽{% endblock %}
+{% import "_components.html" as c with context %}
+{% block title %}首頁{% endblock %}
 {% block content %}
+{{ c.page_header('首頁', '器材狀況同待處理事項一覽') }}
 
-<div class="page-header">
-  <div>
-    <div class="eyebrow">總覽</div>
-    <h1>器材出入管理總覽</h1>
-  </div>
-</div>
-
-<div class="stat-grid">
-  <div class="stat-card">
-    <div class="stat-value">{{ stats.total }}</div>
-    <div class="stat-label">器材總數</div>
-  </div>
-  <div class="stat-card">
-    <div class="stat-value">{{ stats.in_stock }}</div>
-    <div class="stat-label">在庫</div>
-  </div>
-  <div class="stat-card accent">
-    <div class="stat-value">{{ stats.checked_out }}</div>
-    <div class="stat-label">已出Job</div>
-  </div>
-  <div class="stat-card">
-    <div class="stat-value">{{ stats.missing }}</div>
-    <div class="stat-label">遺失</div>
-  </div>
-  <div class="stat-card">
-    <div class="stat-value">{{ stats.open_jobs }}</div>
-    <div class="stat-label">進行中 Job</div>
-  </div>
-  <div class="stat-card">
-    <div class="stat-value">{{ stats.company }}</div>
-    <div class="stat-label">公司數量</div>
-  </div>
-</div>
-
-<div class="grid-2">
-  <div class="card">
-    <div class="section-title">
-      <h2>最近出入紀錄</h2>
-      <a href="{{ url_for('dashboard.movement_list') }}" class="text-muted">查看全部 →</a>
-    </div>
-    {% if recent_movements %}
-      <table>
-        <thead>
-          <tr><th>時間</th><th>Job</th><th>公司</th><th>方向</th><th>數量</th></tr>
-        </thead>
-        <tbody>
-          {% for mv in recent_movements %}
-          <tr>
-            <td>{{ mv.created_at.strftime('%m/%d %H:%M') }}</td>
-            <td>{{ mv.job.name if mv.job else '—' }}</td>
-            <td>{{ mv.company.name if mv.company else '—' }}</td>
-            <td>{{ m.direction_badge(mv.direction) }}</td>
-            <td>{{ (mv.epcs or [])|length }}</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    {% else %}
-      <div class="empty-state">未有出入紀錄</div>
-    {% endif %}
+<div class="page-body">
+  <h2 class="tile-group-title">器材狀況</h2>
+  <div class="tiles">
+    <a class="tile" href="{{ url_for('dashboard.equipment_list') }}">
+      <span class="tile-title">器材總數</span><span class="tile-sub">主檔已登記</span>
+      <span class="tile-kpi">{{ stats.total }}<span class="tile-unit">件</span></span>
+    </a>
+    <a class="tile is-positive" href="{{ url_for('dashboard.equipment_list', status='in_stock') }}">
+      <span class="tile-title">在庫</span><span class="tile-sub">辦公室內</span>
+      <span class="tile-kpi">{{ stats.in_stock }}<span class="tile-unit">件</span></span>
+    </a>
+    <a class="tile is-critical" href="{{ url_for('dashboard.equipment_list', status='checked_out') }}">
+      <span class="tile-title">已出 Job</span><span class="tile-sub">外出拍攝中</span>
+      <span class="tile-kpi">{{ stats.checked_out }}<span class="tile-unit">件</span></span>
+    </a>
+    <a class="tile is-information" href="{{ url_for('dashboard.equipment_list', status='on_loan') }}">
+      <span class="tile-title">借出中</span><span class="tile-sub">借予公司或個人</span>
+      <span class="tile-kpi">{{ stats.on_loan }}<span class="tile-unit">件</span></span>
+    </a>
+    <a class="tile{{ ' is-negative' if stats.missing }}" href="{{ url_for('dashboard.equipment_list', status='missing') }}">
+      <span class="tile-title">遺失</span><span class="tile-sub">需要跟進</span>
+      <span class="tile-kpi">{{ stats.missing }}<span class="tile-unit">件</span></span>
+    </a>
+    <a class="tile{{ ' is-negative' if stats.damaged }}" href="{{ url_for('dashboard.equipment_list', status='damaged') }}">
+      <span class="tile-title">損壞待修</span><span class="tile-sub">暫不可借出</span>
+      <span class="tile-kpi">{{ stats.damaged }}<span class="tile-unit">件</span></span>
+    </a>
   </div>
 
-  <div>
-    <div class="card">
-      <div class="section-title">
-        <h3>進行中 Job</h3>
-        <a href="{{ url_for('dashboard.job_list') }}" class="text-muted">全部 →</a>
+  <h2 class="tile-group-title">借出服務</h2>
+  <div class="tiles">
+    <a class="tile{{ ' is-negative' if stats.overdue }}" href="{{ url_for('dashboard.loan_list', status='overdue') }}">
+      <span class="tile-title">逾期借出單</span><span class="tile-sub">已過到期日未還</span>
+      <span class="tile-kpi">{{ stats.overdue }}<span class="tile-unit">張</span></span>
+    </a>
+    <a class="tile" href="{{ url_for('dashboard.loan_list', status='open') }}">
+      <span class="tile-title">未完結借出單</span><span class="tile-sub">借出中或部分歸還</span>
+      <span class="tile-kpi">{{ stats.open_loans }}<span class="tile-unit">張</span></span>
+    </a>
+    <a class="tile" href="{{ url_for('dashboard.job_list', status='open') }}">
+      <span class="tile-title">進行中 Job</span><span class="tile-sub">未結束</span>
+      <span class="tile-kpi">{{ stats.open_jobs }}<span class="tile-unit">個</span></span>
+    </a>
+    <a class="tile" href="{{ url_for('dashboard.loan_create') }}">
+      <span class="tile-title">新增借出單</span><span class="tile-sub">登記借出器材</span>
+      <span class="tile-action">{{ c.icon('plus') }}建立</span>
+    </a>
+    <a class="tile" href="{{ url_for('dashboard.equipment_create') }}">
+      <span class="tile-title">登記器材</span><span class="tile-sub">新增標籤配對</span>
+      <span class="tile-action">{{ c.icon('tag') }}登記</span>
+    </a>
+  </div>
+
+  <div class="cols-2">
+    <section class="panel" aria-labelledby="ov-title">
+      <div class="panel-head">
+        <h2 class="panel-title" id="ov-title">逾期借出 <span class="panel-count">({{ stats.overdue }})</span></h2>
+        <div class="panel-tools"><a class="btn btn-ghost btn-sm" href="{{ url_for('dashboard.loan_list', status='overdue') }}">查看全部</a></div>
       </div>
-      {% if open_jobs %}
-        <ul class="list-plain">
-          {% for job in open_jobs %}
-            <li><a href="{{ url_for('dashboard.job_detail', job_id=job.id) }}">{{ job.name }}</a></li>
-          {% endfor %}
-        </ul>
+      {% if overdue_loans %}
+      <div class="table-wrap">
+        <table class="data">
+          <thead><tr><th scope="col">單號</th><th scope="col">借用人</th><th scope="col">到期日</th><th scope="col" class="num">未還</th></tr></thead>
+          <tbody>
+            {% for loan in overdue_loans %}
+            <tr data-href="{{ url_for('dashboard.loan_detail', loan_id=loan.id) }}">
+              <td class="nowrap"><a class="row-link" href="{{ url_for('dashboard.loan_detail', loan_id=loan.id) }}">{{ loan.doc_no }}</a></td>
+              <td>{{ loan.borrower_display }}</td>
+              <td class="nowrap">{{ c.status('negative', '逾期 ' ~ loan.days_overdue ~ ' 日') }}<span class="cell-sub">{{ loan.due_date.isoformat() }}</span></td>
+              <td class="num">{{ loan.outstanding_count }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
       {% else %}
-        <p class="text-muted">而家冇進行中嘅 Job</p>
+        {{ c.empty('冇逾期借出', '所有借出單都喺到期日前歸還,做得好。', 'success') }}
       {% endif %}
-    </div>
+    </section>
 
-    <div class="card">
-      <div class="section-title">
-        <h3>遺失器材</h3>
-        <a href="{{ url_for('dashboard.equipment_list', status='missing') }}" class="text-muted">全部 →</a>
+    <section class="panel" aria-labelledby="ds-title">
+      <div class="panel-head">
+        <h2 class="panel-title" id="ds-title">三日內到期 <span class="panel-count">({{ due_soon|length }})</span></h2>
+      </div>
+      {% if due_soon %}
+      <ul class="list-plain">
+        {% for loan in due_soon %}
+        <li>
+          <span><a class="row-link" href="{{ url_for('dashboard.loan_detail', loan_id=loan.id) }}">{{ loan.doc_no }}</a> · {{ loan.borrower_display }}</span>
+          <span class="{{ 'text-critical' if loan.days_until_due == 0 else 'text-muted' }}">{{ loan.due_date.isoformat() }}{% if loan.days_until_due == 0 %}(今日){% endif %}</span>
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+        {{ c.empty('未來三日冇借出單到期', None, 'calendar') }}
+      {% endif %}
+    </section>
+
+    <section class="panel" aria-labelledby="ms-title">
+      <div class="panel-head">
+        <h2 class="panel-title" id="ms-title">遺失器材 <span class="panel-count">({{ stats.missing }})</span></h2>
+        <div class="panel-tools"><a class="btn btn-ghost btn-sm" href="{{ url_for('dashboard.equipment_list', status='missing') }}">查看全部</a></div>
       </div>
       {% if missing_equipment %}
-        <ul class="list-plain">
-          {% for eq in missing_equipment %}
-            <li>{{ eq.name }} <span class="text-muted mono">{{ eq.epc[-6:] }}</span></li>
-          {% endfor %}
-        </ul>
+      <ul class="list-plain">
+        {% for eq in missing_equipment %}
+        <li><a class="row-link" href="{{ url_for('dashboard.equipment_detail', equipment_id=eq.id) }}">{{ eq.name }}</a><span class="epc">{{ eq.epc[-8:] }}</span></li>
+        {% endfor %}
+      </ul>
       {% else %}
-        <p class="text-muted">冇遺失器材,狀況良好</p>
+        {{ c.empty('冇遺失器材', None, 'success') }}
       {% endif %}
-    </div>
+    </section>
+
+    <section class="panel" aria-labelledby="dm-title">
+      <div class="panel-head">
+        <h2 class="panel-title" id="dm-title">損壞待修 <span class="panel-count">({{ stats.damaged }})</span></h2>
+      </div>
+      {% if damaged_equipment %}
+      <ul class="list-plain">
+        {% for eq in damaged_equipment %}
+        <li><a class="row-link" href="{{ url_for('dashboard.equipment_detail', equipment_id=eq.id) }}">{{ eq.name }}</a>{{ c.equipment_status(eq) }}</li>
+        {% endfor %}
+      </ul>
+      {% else %}
+        {{ c.empty('冇損壞器材', None, 'success') }}
+      {% endif %}
+    </section>
+
+    <section class="panel" aria-labelledby="oj-title">
+      <div class="panel-head">
+        <h2 class="panel-title" id="oj-title">進行中 Job <span class="panel-count">({{ stats.open_jobs }})</span></h2>
+        <div class="panel-tools"><a class="btn btn-ghost btn-sm" href="{{ url_for('dashboard.job_list', status='open') }}">查看全部</a></div>
+      </div>
+      {% if open_jobs %}
+      <ul class="list-plain">
+        {% for job in open_jobs %}
+        <li><a class="row-link" href="{{ url_for('dashboard.job_detail', job_id=job.id) }}">{{ job.name }}</a><span class="text-muted">{{ job.date|dstr }}</span></li>
+        {% endfor %}
+      </ul>
+      {% else %}
+        {{ c.empty('而家冇進行中嘅 Job', None, 'briefcase') }}
+      {% endif %}
+    </section>
+
+    <section class="panel" aria-labelledby="ac-title">
+      <div class="panel-head">
+        <h2 class="panel-title" id="ac-title">最近活動</h2>
+        <div class="panel-tools"><a class="btn btn-ghost btn-sm" href="{{ url_for('dashboard.report_changes') }}">變更紀錄</a></div>
+      </div>
+      {% if activity %}
+      <ul class="timeline">
+        {% for a in activity %}
+        <li>
+          <span class="what">
+            {% set url = entity_url(a) %}
+            {% if url %}<a href="{{ url }}">{{ a.entity_label or a.doc_no }}</a>{% else %}{{ a.entity_label or a.doc_no }}{% endif %}
+            · {{ a.summary }}
+          </span>
+          <span class="when" title="{{ a.created_at|ldt }}">{{ a.created_at|reltime }}</span>
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+        {{ c.empty('未有活動紀錄', None, 'doc') }}
+      {% endif %}
+    </section>
   </div>
 </div>
-
 {% endblock %}

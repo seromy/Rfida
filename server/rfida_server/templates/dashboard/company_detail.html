@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% import "_components.html" as c with context %}
+{% block title %}{{ company.name }}{% endblock %}
+{% block content %}
+{% set open_loans = loans|selectattr('is_open')|list %}
+{% call c.page_header(company.name, None,
+    [('首頁', url_for('dashboard.index')), ('公司', url_for('dashboard.company_list')), (company.doc_no, None)],
+    None,
+    c.facts([
+      ('公司編號', company.doc_no),
+      ('聯絡人', company.contact_name),
+      ('電話', company.phone),
+      ('電郵', company.email),
+      ('未完結借出單', open_loans|length),
+      ('建立日期', company.created_at|ldate if company.created_at else None)
+    ])) %}
+  <a class="btn btn-primary" href="{{ url_for('dashboard.loan_create', company_id=company.id) }}">{{ c.icon('loan') }}新增借出單</a>
+  <a class="btn" href="{{ url_for('dashboard.company_edit', company_id=company.id) }}">{{ c.icon('edit') }}編輯</a>
+  {{ c.confirm_button(url_for('dashboard.company_delete', company_id=company.id), '刪除', '確定刪除公司「' ~ company.name ~ '」?', 'btn btn-negative', '刪除') }}
+{% endcall %}
+
+<div class="tabbar" role="tablist" aria-label="公司資料分頁" data-tabs>
+  <button type="button" role="tab" class="tab" id="tab-loans" aria-controls="panel-loans" aria-selected="true">借出單<span class="tab-count">{{ loans|length }}</span></button>
+  <button type="button" role="tab" class="tab" id="tab-movements" aria-controls="panel-movements" aria-selected="false">出入紀錄<span class="tab-count">{{ movements|length }}</span></button>
+  <button type="button" role="tab" class="tab" id="tab-inventory" aria-controls="panel-inventory" aria-selected="false">盤點<span class="tab-count">{{ inventories|length }}</span></button>
+  <button type="button" role="tab" class="tab" id="tab-notes" aria-controls="panel-notes" aria-selected="false">備註</button>
+  <button type="button" role="tab" class="tab" id="tab-changes" aria-controls="panel-changes" aria-selected="false">變更紀錄<span class="tab-count">{{ audit|length }}</span></button>
+</div>
+
+<div class="page-body">
+  <div role="tabpanel" id="panel-loans" aria-labelledby="tab-loans">
+    <section class="panel">
+      <div class="panel-head"><h2 class="panel-title">借出單 <span class="panel-count">({{ loans|length }})</span></h2></div>
+      {% if loans %}
+      <div class="table-wrap">
+        <table class="data">
+          <thead><tr><th scope="col">單號</th><th scope="col">借用人</th><th scope="col">到期日</th><th scope="col">狀態</th><th scope="col" class="num">件數</th></tr></thead>
+          <tbody>
+            {% for loan in loans %}
+            <tr data-href="{{ url_for('dashboard.loan_detail', loan_id=loan.id) }}">
+              <td class="nowrap"><a class="row-link" href="{{ url_for('dashboard.loan_detail', loan_id=loan.id) }}">{{ loan.doc_no }}</a></td>
+              <td>{{ loan.borrower_name or '—' }}</td>
+              <td class="nowrap tnum">{{ c.due_label(loan) }}</td>
+              <td>{{ c.loan_status(loan) }}</td>
+              <td class="num">{{ loan.item_count }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+        {% call c.empty('未有借出單', None, 'loan') %}<a class="btn btn-primary" href="{{ url_for('dashboard.loan_create', company_id=company.id) }}">新增借出單</a>{% endcall %}
+      {% endif %}
+    </section>
+  </div>
+
+  <div role="tabpanel" id="panel-movements" aria-labelledby="tab-movements" hidden>
+    <section class="panel">
+      <div class="panel-head"><h2 class="panel-title">出入紀錄 <span class="panel-count">({{ movements|length }})</span></h2></div>
+      {% if movements %}
+      <div class="table-wrap">
+        <table class="data">
+          <thead><tr><th scope="col">單號</th><th scope="col">時間</th><th scope="col">方向</th><th scope="col">Job</th><th scope="col" class="num">數量</th></tr></thead>
+          <tbody>
+            {% for mv in movements %}
+            <tr data-href="{{ url_for('dashboard.movement_detail', movement_id=mv.id) }}">
+              <td class="nowrap"><a class="row-link" href="{{ url_for('dashboard.movement_detail', movement_id=mv.id) }}">{{ mv.doc_no }}</a></td>
+              <td class="nowrap tnum">{{ mv.created_at|ldt }}</td>
+              <td>{{ c.direction_status(mv.direction) }}</td>
+              <td>{{ mv.job.name if mv.job else '—' }}</td>
+              <td class="num">{{ (mv.epcs or [])|length }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}{{ c.empty('未有出入紀錄', None, 'swap') }}{% endif %}
+    </section>
+  </div>
+
+  <div role="tabpanel" id="panel-inventory" aria-labelledby="tab-inventory" hidden>
+    <section class="panel">
+      <div class="panel-head"><h2 class="panel-title">盤點 <span class="panel-count">({{ inventories|length }})</span></h2></div>
+      {% if inventories %}
+      <div class="table-wrap">
+        <table class="data">
+          <thead><tr><th scope="col">單號</th><th scope="col">時間</th><th scope="col">批次</th><th scope="col" class="num">掃描</th><th scope="col" class="num">未知標籤</th></tr></thead>
+          <tbody>
+            {% for s in inventories %}
+            <tr data-href="{{ url_for('dashboard.inventory_detail', session_id=s.id) }}">
+              <td class="nowrap"><a class="row-link" href="{{ url_for('dashboard.inventory_detail', session_id=s.id) }}">{{ s.doc_no }}</a></td>
+              <td class="nowrap tnum">{{ s.timestamp|ldt }}</td>
+              <td>{{ s.batch_label or '—' }}</td>
+              <td class="num">{{ (s.scanned_epcs or [])|length }}</td>
+              <td class="num">{{ (s.unknown_epcs or [])|length }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}{{ c.empty('未有盤點紀錄', None, 'clipboard') }}{% endif %}
+    </section>
+  </div>
+
+  <div role="tabpanel" id="panel-notes" aria-labelledby="tab-notes" hidden>
+    <section class="panel">
+      <div class="panel-head"><h2 class="panel-title">備註</h2></div>
+      <div class="panel-body">{% if company.note %}<p style="white-space:pre-line">{{ company.note }}</p>{% else %}<p class="text-muted">未有備註。</p>{% endif %}</div>
+    </section>
+  </div>
+
+  <div role="tabpanel" id="panel-changes" aria-labelledby="tab-changes" hidden>
+    <section class="panel">
+      <div class="panel-head"><h2 class="panel-title">變更紀錄 <span class="panel-count">({{ audit|length }})</span></h2></div>
+      {{ c.audit_table(audit) }}
+    </section>
+  </div>
+</div>
+{% endblock %}

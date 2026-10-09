@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% import "_components.html" as c with context %}
+{% block title %}借出單{% endblock %}
+{% block content %}
+{% call c.page_header('借出單', '器材借用服務:借出、到期跟進、歸還點收', [('首頁', url_for('dashboard.index')), ('借出單', None)]) %}
+  <a class="btn btn-ghost" href="{{ url_for('dashboard.loan_export', **request.args) }}">{{ c.icon('download') }}匯出 CSV</a>
+  <a class="btn btn-primary" href="{{ url_for('dashboard.loan_create') }}">{{ c.icon('plus') }}新增借出單</a>
+{% endcall %}
+
+<div class="page-body">
+  <form class="filterbar" method="get" role="search" aria-label="借出單篩選">
+    <div class="filter-grid">
+      <div class="field field-wide">
+        <label for="f-q">搜尋</label>
+        <input type="search" id="f-q" name="q" value="{{ q }}" placeholder="單號 / 借用人 / 公司 / 器材名稱或 EPC / 用途">
+      </div>
+      <div class="field">
+        <label for="f-company_id">公司</label>
+        <select id="f-company_id" name="company_id">
+          <option value="">全部</option>
+          {% for co in companies %}<option value="{{ co.id }}" {{ 'selected' if company_id == co.id|string }}>{{ co.name }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="field"><label for="f-due_from">到期日由</label><input type="date" id="f-due_from" name="due_from" value="{{ due_from }}"></div>
+      <div class="field"><label for="f-due_to">到期日至</label><input type="date" id="f-due_to" name="due_to" value="{{ due_to }}"></div>
+      <input type="hidden" name="status" value="{{ status }}">
+      <div class="filter-actions">
+        <button class="btn btn-primary" type="submit">{{ c.icon('search') }}查詢</button>
+        <a class="btn btn-ghost" href="{{ url_for('dashboard.loan_list') }}">{{ c.icon('reset') }}重設</a>
+      </div>
+    </div>
+  </form>
+
+  <nav class="quick-filters" aria-label="按狀態篩選">
+    {% for key, label, n, cls in [('', '全部', counts.all, ''), ('open', '借出中', counts.open, ''), ('overdue', '逾期', counts.overdue, 'is-alert'), ('returned', '已歸還', counts.returned, ''), ('cancelled', '已取消', counts.cancelled, '')] %}
+      <a class="qf {{ cls if n }}" href="{{ url_args(status=key, page=None) }}" {% if status == key %}aria-current="true"{% endif %}>{{ label }}<span class="qf-count">{{ n }}</span></a>
+    {% endfor %}
+  </nav>
+
+  <section class="panel" aria-labelledby="list-title">
+    <div class="panel-head"><h2 class="panel-title" id="list-title">借出單 <span class="panel-count">({{ page.total }})</span></h2></div>
+    {% if items %}
+    <div class="table-wrap">
+      <table class="data">
+        <thead>
+          <tr>
+            {{ c.sort_th('id', '單號', sort, dir) }}
+            {{ c.sort_th('borrower', '借用人', sort, dir) }}
+            <th scope="col">器材</th>
+            {{ c.sort_th('loan_date', '借出日期', sort, dir) }}
+            {{ c.sort_th('due', '到期日', sort, dir) }}
+            {{ c.sort_th('status', '狀態', sort, dir) }}
+            <th scope="col" class="num">未還 / 總數</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for loan in items %}
+          {% set live = loan.items|rejectattr('state', 'equalto', 'cancelled')|list %}
+          <tr data-href="{{ url_for('dashboard.loan_detail', loan_id=loan.id) }}">
+            <td class="nowrap"><a class="row-link" href="{{ url_for('dashboard.loan_detail', loan_id=loan.id) }}">{{ loan.doc_no }}</a></td>
+            <td>
+              {{ loan.company.name if loan.company else (loan.borrower_name or '—') }}
+              {% if loan.company and loan.borrower_name %}<span class="cell-sub">{{ loan.borrower_name }}</span>{% endif %}
+            </td>
+            <td>
+              {{ live[0].equipment.name if live else '—' }}
+              {% if live|length > 1 %}<span class="cell-sub">另外 {{ live|length - 1 }} 件</span>{% endif %}
+            </td>
+            <td class="nowrap tnum">{{ loan.loan_date|ldate }}</td>
+            <td class="nowrap tnum">{{ c.due_label(loan) }}</td>
+            <td>{{ c.loan_status(loan) }}</td>
+            <td class="num">{{ loan.outstanding_count }} / {{ loan.item_count }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {{ c.pagination(page) }}
+    {% else %}
+      {% call c.empty('搵唔到借出單', '新增借出單,記錄器材借出同到期日。', 'loan') %}
+        <a class="btn btn-primary" href="{{ url_for('dashboard.loan_create') }}">新增借出單</a>
+      {% endcall %}
+    {% endif %}
+  </section>
+</div>
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% import "_components.html" as c with context %}
+{% set editing = job is not none %}
+{% block title %}{{ '編輯 Job' if editing else '建立 Job' }}{% endblock %}
+{% block content %}
+{{ c.page_header(
+    ('編輯 ' ~ job.name) if editing else '建立 Job',
+    ('編號 ' ~ job.doc_no) if editing else '建立後,手提機就可以揀選呢個 Job 出發',
+    [('首頁', url_for('dashboard.index')), ('Job', url_for('dashboard.job_list'))] + ([(job.name, url_for('dashboard.job_detail', job_id=job.id)), ('編輯', None)] if editing else [('建立', None)])) }}
+
+<div class="page-body">
+  <form method="post" novalidate>
+    {{ c.csrf() }}
+    {{ c.message_strip('error', errors, '未能儲存,請修正以下問題:') }}
+    <section class="panel">
+      <div class="panel-head"><h2 class="panel-title">Job 資料</h2></div>
+      <div class="panel-body">
+        <div class="form-grid">
+          {{ c.field('name', 'Job 名稱', form.name, required=True, placeholder='2026-09-12 婚禮攝影', maxlength=200, autofocus=True) }}
+          {{ c.field('date', '日期', form.date, type='date', required=True) }}
+        </div>
+      </div>
+    </section>
+    <div class="form-footer">
+      <a class="btn btn-ghost" href="{{ url_for('dashboard.job_detail', job_id=job.id) if editing else url_for('dashboard.job_list') }}">取消</a>
+      <button type="submit" class="btn btn-primary">{{ '儲存' if editing else '建立' }}</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

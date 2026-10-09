@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+{% import "_components.html" as c with context %}
+{% block title %}{{ loan.doc_no }}{% endblock %}
+{% block content %}
+{% set outstanding = loan.outstanding_items %}
+{% set can_cancel = loan.status == 'active' and not (loan.items|selectattr('state', 'equalto', 'returned')|list) %}
+{% call c.page_header('借出單 ' ~ loan.doc_no, loan.borrower_display,
+    [('首頁', url_for('dashboard.index')), ('借出單', url_for('dashboard.loan_list')), (loan.doc_no, None)],
+    c.loan_status(loan),
+    c.facts([
+      ('借出日期', loan.loan_date|ldate),
+      ('到期日', c.due_label(loan)),
+      ('用途', loan.purpose),
+      ('經手人', loan.handled_by),
+      ('聯絡方式', loan.contact),
+      ('未還 / 總數', loan.outstanding_count ~ ' / ' ~ loan.item_count)
+    ] + ([('完結日期', loan.returned_at|ldt)] if loan.returned_at else []))) %}
+  {% if loan.is_open %}
+    {{ c.confirm_button(url_for('dashboard.loan_return_all', loan_id=loan.id), '全部正常歸還', '確定將餘下 ' ~ outstanding|length ~ ' 件器材全部登記為正常歸還?', 'btn btn-primary', '全部歸還') }}
+    <button type="button" class="btn" data-open-dialog="extend-dialog">{{ c.icon('calendar') }}延期</button>
+    {% if can_cancel %}<button type="button" class="btn btn-negative" data-open-dialog="cancel-dialog">取消借出單</button>{% endif %}
+  {% endif %}
+  <a class="btn" href="{{ url_for('dashboard.loan_print', loan_id=loan.id) }}" target="_blank" rel="noopener">{{ c.icon('printer') }}列印借用單</a>
+{% endcall %}
+
+<div class="tabbar" role="tablist" aria-label="借出單分頁" data-tabs>
+  <button type="button" role="tab" class="tab" id="tab-items" aria-controls="panel-items" aria-selected="true">器材項目<span class="tab-count">{{ loan.item_count }}</span></button>
+  <button type="button" role="tab" class="tab" id="tab-details" aria-controls="panel-details" aria-selected="false">借用資料</button>
+  <button type="button" role="tab" class="tab" id="tab-changes" aria-controls="panel-changes" aria-selected="false">變更紀錄<span class="tab-count">{{ audit|length }}</span></button>
+</div>
+
+<div class="page-body">
+  <div role="tabpanel" id="panel-items" aria-labelledby="tab-items">
+    {% if loan.is_overdue %}
+      {{ c.message_strip('error', ['已逾期 ' ~ loan.days_overdue ~ ' 日(到期日 ' ~ loan.due_date.isoformat() ~ ')。' ~ ('請聯絡借用人:' ~ loan.contact if loan.contact else '請聯絡借用人跟進歸還。')]) }}
+    {% elif loan.is_open and loan.days_until_due == 0 %}
+      {{ c.message_strip('warning', ['今日到期,請提醒借用人歸還。']) }}
+    {% endif %}
+    {% if loan.status == 'cancelled' %}{{ c.message_strip('info', ['呢張借出單已取消,器材已回復在庫。']) }}{% endif %}
+
+    <form method="post" action="{{ url_for('dashboard.loan_return', loan_id=loan.id) }}" class="panel">
+      {{ c.csrf() }}
+      <div class="panel-head"><h2 class="panel-title">器材項目 <span class="panel-count">({{ loan.items|length }})</span></h2></div>
+      <div class="table-wrap">
+        <table class="data">
+          <thead>
+            <tr>
+              {% if outstanding and loan.is_open %}<th scope="col" class="sel"><input type="checkbox" data-select-all="return" aria-label="全選未還器材"></th>{% endif %}
+              <th scope="col">器材</th><th scope="col">EPC</th><th scope="col">狀態</th>
+              {% if outstanding and loan.is_open %}<th scope="col">歸還狀況</th><th scope="col">備註</th>{% endif %}
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in loan.items %}
+            {% set eq = item.equipment %}
+            <tr>
+              {% if outstanding and loan.is_open %}
+              <td class="sel">{% if item.state == 'out' %}<input type="checkbox" name="return_item" value="{{ item.id }}" data-select="return" aria-label="歸還 {{ eq.name }}">{% endif %}</td>
+              {% endif %}
+              <td>
+                <a class="row-link" href="{{ url_for('dashboard.equipment_detail', equipment_id=eq.id) }}">{{ eq.name }}</a>
+                <span class="cell-sub">{{ eq.category or '未分類' }}{% if eq.serial_number %} · 序號 {{ eq.serial_number }}{% endif %}</span>
+              </td>
+              <td class="nowrap">{{ c.epc_short(eq.epc) }}</td>
+              <td>
+                {% if item.state == 'out' %}{{ c.status('information', '借出中') }}
+                {% elif item.state == 'cancelled' %}{{ c.status('neutral', '已取消') }}
+                {% else %}
+                  {{ c.status('positive' if item.return_condition == 'good' else 'negative', '已歸還・' ~ CONDITION_LABELS.get(item.return_condition, '')) }}
+                  <span class="cell-sub">{{ item.returned_at|ldt }}{% if item.return_note %} · {{ item.return_note }}{% endif %}</span>
+                {% endif %}
+              </td>
+              {% if outstanding and loan.is_open %}
+              <td>{% if item.state == 'out' %}
+                <select name="condition_{{ item.id }}" class="input-sm" data-enable-when-selected aria-label="{{ eq.name }} 歸還狀況">
+                  <option value="good">正常</option><option value="damaged">損壞</option><option value="lost">遺失</option>
+                </select>{% endif %}</td>
+              <td>{% if item.state == 'out' %}<input type="text" name="note_{{ item.id }}" class="input-sm" maxlength="300" placeholder="例如:鏡頭有刮花" data-enable-when-selected aria-label="{{ eq.name }} 備註" autocomplete="off">{% endif %}</td>
+              {% endif %}
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% if outstanding and loan.is_open %}
+      <div class="return-controls">
+        <span class="grow">已揀選 <strong data-select-count="return">0</strong> / {{ outstanding|length }} 件未還器材</span>
+        <button type="submit" class="btn btn-primary" data-needs-selection="return" disabled>辦理歸還所選</button>
+      </div>
+      {% endif %}
+    </form>
+  </div>
+
+  <div role="tabpanel" id="panel-details" aria-labelledby="tab-details" hidden>
+    <form method="post" action="{{ url_for('dashboard.loan_update', loan_id=loan.id) }}" class="panel" novalidate>
+      {{ c.csrf() }}
+      <div class="panel-head"><h2 class="panel-title">借用資料</h2></div>
+      <div class="panel-body">
+        <div class="form-grid">
+          <div class="field">
+            <span class="field-label">公司</span>
+            <div>{% if loan.company %}<a href="{{ url_for('dashboard.company_detail', company_id=loan.company.id) }}">{{ loan.company.name }}</a>{% else %}<span class="text-muted">個人 / 無公司</span>{% endif %}</div>
+          </div>
+          {{ c.field('borrower_name', '借用人姓名', loan.borrower_name, maxlength=200) }}
+          {{ c.field('contact', '聯絡方式', loan.contact, maxlength=200) }}
+          {{ c.field('purpose', '用途', loan.purpose, maxlength=200) }}
+          {{ c.field('handled_by', '經手人', loan.handled_by, maxlength=100) }}
+          <div class="field field-full">
+            <label for="f-note">備註</label>
+            <textarea id="f-note" name="note" maxlength="2000" rows="3">{{ loan.note }}</textarea>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary">儲存</button>
+      </div>
+    </form>
+  </div>
+
+  <div role="tabpanel" id="panel-changes" aria-labelledby="tab-changes" hidden>
+    <section class="panel">
+      <div class="panel-head"><h2 class="panel-title">變更紀錄 <span class="panel-count">({{ audit|length }})</span></h2></div>
+      {{ c.audit_table(audit) }}
+    </section>
+  </div>
+</div>
+
+{% if loan.is_open %}
+<dialog id="extend-dialog" class="dialog" aria-labelledby="extend-title">
+  <form method="post" action="{{ url_for('dashboard.loan_extend', loan_id=loan.id) }}">
+    {{ c.csrf() }}
+    <h2 class="dialog-title" id="extend-title">延長借出期限</h2>
+    <p class="dialog-body">現時到期日:{{ loan.due_date.isoformat() }}</p>
+    {{ c.field('due_date', '新嘅到期日', loan.due_date.isoformat(), type='date', required=True) }}
+    {{ c.field('reason', '原因(選填)', '', maxlength=200, placeholder='例如:客戶要求延期') }}
+    <div class="dialog-actions">
+      <button type="button" class="btn btn-ghost" data-close-dialog>取消</button>
+      <button type="submit" class="btn btn-primary">確認延期</button>
+    </div>
+  </form>
+</dialog>
+{% if can_cancel %}
+<dialog id="cancel-dialog" class="dialog" aria-labelledby="cancel-title">
+  <form method="post" action="{{ url_for('dashboard.loan_cancel', loan_id=loan.id) }}">
+    {{ c.csrf() }}
+    <h2 class="dialog-title" id="cancel-title">取消借出單</h2>
+    <p class="dialog-body">取消後所有器材會回復在庫,呢張借出單會標記為已取消。只適用於未有任何歸還嘅借出單(例如登記錯誤)。</p>
+    {{ c.field('reason', '原因(選填)', '', maxlength=200, placeholder='例如:客戶改期') }}
+    <div class="dialog-actions">
+      <button type="button" class="btn btn-ghost" data-close-dialog>返回</button>
+      <button type="submit" class="btn btn-negative">取消借出單</button>
+    </div>
+  </form>
+</dialog>
+{% endif %}
+{% endif %}
+{% endblock %}

@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% import "_components.html" as c with context %}
+{% block title %}庫存概覽{% endblock %}
+{% block content %}
+{% call c.page_header('庫存概覽', '按分類統計各狀態嘅器材數量', [('首頁', url_for('dashboard.index')), ('報表', None), ('庫存概覽', None)]) %}
+  <a class="btn btn-ghost" href="{{ url_for('dashboard.report_stock_export') }}">{{ c.icon('download') }}匯出 CSV</a>
+{% endcall %}
+
+<div class="page-body">
+  <section class="panel" aria-labelledby="rep-title">
+    <div class="panel-head">
+      <h2 class="panel-title" id="rep-title">各分類庫存 <span class="panel-count">({{ rows|length }})</span></h2>
+    </div>
+    {% if rows %}
+    <div class="table-wrap">
+      <table class="data">
+        <thead>
+          <tr>
+            <th scope="col">分類</th>
+            <th scope="col" class="num">總數</th>
+            <th scope="col" class="num">在庫</th>
+            <th scope="col" class="num">可借出</th>
+            <th scope="col" class="num">已出 Job</th>
+            <th scope="col" class="num">借出中</th>
+            <th scope="col" class="num">遺失</th>
+            <th scope="col" class="num">損壞</th>
+            <th scope="col">分佈</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in rows %}
+          <tr>
+            <td><a class="row-link" href="{{ url_for('dashboard.equipment_list', category=r.category if r.category != '未分類' else None) }}">{{ r.category }}</a></td>
+            <td class="num">{{ r.total }}</td>
+            <td class="num">{{ r.in_stock }}</td>
+            <td class="num">{{ r.available }}</td>
+            <td class="num">{{ r.checked_out }}</td>
+            <td class="num">{{ r.on_loan }}</td>
+            <td class="num{{ ' text-negative' if r.missing }}">{{ r.missing }}</td>
+            <td class="num{{ ' text-negative' if r.damaged }}">{{ r.damaged }}</td>
+            <td>
+              <div class="stackbar" role="img" aria-label="在庫 {{ r.in_stock }}、已出 Job {{ r.checked_out }}、借出中 {{ r.on_loan }}、遺失 {{ r.missing }}">
+                <span class="seg-positive" style="width:{{ r.in_stock * 100 / r.total }}%"></span>
+                <span class="seg-critical" style="width:{{ r.checked_out * 100 / r.total }}%"></span>
+                <span class="seg-information" style="width:{{ r.on_loan * 100 / r.total }}%"></span>
+                <span class="seg-negative" style="width:{{ r.missing * 100 / r.total }}%"></span>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+        <tfoot>
+          <tr>
+            <td>合計</td>
+            <td class="num">{{ total.total }}</td>
+            <td class="num">{{ total.in_stock }}</td>
+            <td class="num">{{ total.available }}</td>
+            <td class="num">{{ total.checked_out }}</td>
+            <td class="num">{{ total.on_loan }}</td>
+            <td class="num">{{ total.missing }}</td>
+            <td class="num">{{ total.damaged }}</td>
+            <td></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+    <p class="panel-note">「損壞」係器材狀況,同「在庫」等狀態唔互斥;「可借出」= 在庫而且冇損壞。圖表:綠 在庫、橙 已出 Job、藍 借出中、紅 遺失。</p>
+    {% else %}
+      {% call c.empty('未有器材資料', None, 'chart') %}<a class="btn btn-primary" href="{{ url_for('dashboard.equipment_create') }}">登記器材</a>{% endcall %}
+    {% endif %}
+  </section>
+</div>
+{% endblock %}

@@ -1,29 +1,37 @@
-from datetime import datetime, timezone
+"""REST API consumed by the iPhone handheld app (docs/API_CONTRACT.md).
+
+Contract rules that must not drift:
+  * equipment `status` is one of in_stock / checked_out / missing
+  * timestamps are ISO-8601 UTC without fractions (`2026-09-11T10:30:00Z`)
+  * errors come back as `{"error": "<text>"}`; the app shows the body verbatim
+"""
 
 from flask import Blueprint, jsonify, request
 
+from . import services
 from .extensions import db
-from .models import (
-    Company,
-    Equipment,
-    InventorySession,
-    Job,
-    Movement,
-    VALID_DIRECTIONS,
-    utcnow,
-)
+from .models import Company, Equipment, Job, Loan
+from .services import ServiceError
+from .utils import normalize_epc_list, parse_iso_datetime, to_int
 
 api_bp = Blueprint("api", __name__, url_prefix="/api")
 
 
-def parse_iso(value):
-    if not value:
-        return None
-    text = value.replace("Z", "+00:00")
-    dt = datetime.fromisoformat(text)
-    if dt.tzinfo is None:
-        dt = dt.replace(tzinfo=timezone.utc)
-    return dt.astimezone(timezone.utc).replace(tzinfo=None)
+def json_body():
+    body = request.get_json(silent=True)
+    if body is None:
+        return {}
+    if not isinstance(body, dict):
+        raise ServiceError("request body must be a JSON object")
+    return body
+
+
+@api_bp.errorhandler(ServiceError)
+def handle_service_error(err):
+    return jsonify({"error": "; ".join(err.messages)}), err.status
+
+
+# ------------------------------------------------------------------ read
 
 
 @api_bp.get("/equipment")
@@ -44,13 +52,13 @@ def list_jobs():
     status = request.args.get("status")
     if status:
         query = query.filter_by(status=status)
-    items = query.order_by(Job.date.desc()).all()
+    items = query.order_by(Job.date.desc(), Job.id.desc()).all()
     return jsonify([item.to_dict() for item in items])
 
 
 @api_bp.get("/jobs/<int:job_id>/expected-items")
 def job_expected_items(job_id):
-    job = Job.query.get_or_404(job_id)
+    job = db.get_or_404(Job, job_id)
     movement = job.latest_out_movement()
     if not movement:
         return jsonify([])
@@ -66,93 +74,141 @@ def job_expected_items(job_id):
     return jsonify(result)
 
 
+# ------------------------------------------------------------------ handheld writes
+
+
 @api_bp.post("/equipment/register")
 def register_equipment():
-    body = request.get_json(silent=True) or {}
-    epc = (body.get("epc") or "").strip()
-    if not epc:
-        return jsonify({"error": "epc is required"}), 400
-
-    existing = Equipment.query.filter_by(epc=epc).first()
-    if existing:
-        return jsonify({"error": f"epc {epc} 已經登記咗"}), 409
-
-    equipment = Equipment(
-        epc=epc,
-        name=body.get("name") or "",
-        category=body.get("category") or "",
-        serial_number=body.get("serialNumber") or "",
-        status="in_stock",
+    body = json_body()
+    equipment = services.create_equipment(
+        {
+            "epc": body.get("epc"),
+            "name": body.get("name"),
+            "category": body.get("category"),
+            "serial_number": body.get("serialNumber"),
+        },
+        source="handheld",
     )
-    db.session.add(equipment)
-    db.session.commit()
     return jsonify(equipment.to_dict()), 201
 
 
 @api_bp.post("/movements")
 def create_movement():
-    body = request.get_json(silent=True) or {}
-    direction = body.get("direction")
-    if direction not in VALID_DIRECTIONS:
-        return jsonify({"error": "direction must be 'out' or 'in'"}), 400
-
-    epcs = body.get("epcs") or []
-    missing_epcs = body.get("missingEpcs")
-
-    movement = Movement(
-        job_id=body.get("jobId"),
-        company_id=body.get("companyId"),
-        direction=direction,
-        epcs=epcs,
-        missing_epcs=missing_epcs,
+    body = json_body()
+    movement, unknown = services.record_movement(
+        direction=body.get("direction"),
+        epcs=body.get("epcs"),
+        missing_epcs=body.get("missingEpcs"),
+        job_id=to_int(body.get("jobId")),
+        company_id=to_int(body.get("companyId")),
         note=body.get("note"),
+        source="handheld",
     )
-    db.session.add(movement)
-
-    now = utcnow()
-    if direction == "out":
-        Equipment.query.filter(Equipment.epc.in_(epcs)).update(
-            {"status": "checked_out", "last_seen_at": now},
-            synchronize_session=False,
-        )
-    else:
-        if epcs:
-            Equipment.query.filter(Equipment.epc.in_(epcs)).update(
-                {"status": "in_stock", "last_seen_at": now},
-                synchronize_session=False,
-            )
-        if missing_epcs:
-            Equipment.query.filter(Equipment.epc.in_(missing_epcs)).update(
-                {"status": "missing"}, synchronize_session=False
-            )
-
-    db.session.commit()
-    return jsonify(movement.to_dict()), 201
+    data = movement.to_dict()
+    data["unknownEpcs"] = unknown
+    return jsonify(data), 201
 
 
 @api_bp.post("/inventory-sessions")
 def create_inventory_session():
-    body = request.get_json(silent=True) or {}
-    scanned_epcs = body.get("scannedEpcs") or []
-    timestamp = parse_iso(body.get("timestamp")) or utcnow()
-
-    known = {
-        e.epc: e for e in Equipment.query.filter(Equipment.epc.in_(scanned_epcs)).all()
-    }
-    unknown_epcs = [epc for epc in scanned_epcs if epc not in known]
-
-    for equipment in known.values():
-        equipment.last_seen_at = timestamp
-        if equipment.status == "missing":
-            equipment.status = "in_stock"
-
-    session = InventorySession(
-        company_id=body.get("companyId"),
-        batch_label=body.get("batchLabel") or "",
-        scanned_epcs=scanned_epcs,
-        unknown_epcs=unknown_epcs,
+    body = json_body()
+    try:
+        timestamp = parse_iso_datetime(body.get("timestamp"))
+    except ValueError:
+        raise ServiceError("timestamp must be an ISO-8601 date-time, e.g. 2026-09-11T10:30:00Z")
+    session = services.record_inventory(
+        company_id=to_int(body.get("companyId")),
+        batch_label=body.get("batchLabel"),
+        scanned_epcs=body.get("scannedEpcs"),
         timestamp=timestamp,
+        source="handheld",
     )
-    db.session.add(session)
-    db.session.commit()
     return jsonify(session.to_dict()), 201
+
+
+# ------------------------------------------------------------------ loans
+# Additive to the handheld contract: used by the web dashboard's loan service and
+# available to any future client. Document in docs/API_CONTRACT.md.
+
+
+@api_bp.get("/loans")
+def list_loans():
+    query = Loan.query
+    status = request.args.get("status")
+    if status == "overdue":
+        query = services.overdue_loans_query()
+    elif status:
+        query = query.filter_by(status=status)
+    equipment_id = to_int(request.args.get("equipmentId"))
+    if equipment_id is not None:
+        query = query.filter(Loan.items.any(equipment_id=equipment_id))
+    items = query.order_by(Loan.due_date, Loan.id).all()
+    return jsonify([item.to_dict() for item in items])
+
+
+@api_bp.get("/loans/<int:loan_id>")
+def get_loan(loan_id):
+    return jsonify(db.get_or_404(Loan, loan_id).to_dict())
+
+
+@api_bp.post("/loans")
+def create_loan():
+    body = json_body()
+    epcs = body.get("epcs")
+    loan = services.create_loan(
+        {
+            "company_id": body.get("companyId"),
+            "borrower_name": body.get("borrowerName"),
+            "contact": body.get("contact"),
+            "purpose": body.get("purpose"),
+            "handled_by": body.get("handledBy"),
+            "due_date": body.get("dueDate"),
+            "loan_date": body.get("loanDate"),
+            "note": body.get("note"),
+        },
+        epcs=epcs if epcs is not None else [],
+        source="api",
+    )
+    return jsonify(loan.to_dict()), 201
+
+
+@api_bp.post("/loans/<int:loan_id>/return")
+def return_loan(loan_id):
+    loan = db.get_or_404(Loan, loan_id)
+    body = json_body()
+    if body.get("returnAll"):
+        services.return_all_good(loan, source="api")
+        return jsonify(loan.to_dict())
+
+    entries = body.get("items")
+    if not isinstance(entries, list) or not entries:
+        raise ServiceError('provide "items": [{"epc": ..., "condition": "good|damaged|lost"}] or "returnAll": true')
+    by_epc = {i.equipment.epc: i for i in loan.items}
+    returns = []
+    for entry in entries:
+        if not isinstance(entry, dict):
+            raise ServiceError("each item must be an object")
+        clean, _ = normalize_epc_list([entry.get("epc")])
+        item = by_epc.get(clean[0]) if clean else None
+        if item is None:
+            raise ServiceError(f"EPC {entry.get('epc')} 不屬於此借出單。")
+        returns.append(
+            {"item_id": item.id, "condition": entry.get("condition") or "good", "note": entry.get("note")}
+        )
+    services.return_loan_items(loan, returns, source="api")
+    return jsonify(loan.to_dict())
+
+
+@api_bp.post("/loans/<int:loan_id>/extend")
+def extend_loan(loan_id):
+    loan = db.get_or_404(Loan, loan_id)
+    body = json_body()
+    services.extend_loan(loan, body.get("dueDate"), reason=body.get("reason") or "", source="api")
+    return jsonify(loan.to_dict())
+
+
+@api_bp.post("/loans/<int:loan_id>/cancel")
+def cancel_loan(loan_id):
+    loan = db.get_or_404(Loan, loan_id)
+    services.cancel_loan(loan, reason=json_body().get("reason") or "", source="api")
+    return jsonify(loan.to_dict())

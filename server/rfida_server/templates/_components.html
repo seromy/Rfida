@@ -1,0 +1,195 @@
+{# Shared Fiori-style building blocks. Import with: {% import "_components.html" as c with context %} #}
+
+{% macro icon(name, cls='') -%}
+<svg class="icon {{ cls }}" aria-hidden="true" focusable="false"><use href="#i-{{ name }}"/></svg>
+{%- endmacro %}
+
+{% macro csrf() -%}
+<input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+{%- endmacro %}
+
+{# ObjectStatus: semantic colour + icon + text (never colour alone). #}
+{% macro status(kind, label) -%}
+  {% set icons = {'positive': 'success', 'critical': 'warning', 'negative': 'error', 'information': 'info', 'neutral': 'dot'} %}
+  <span class="status status-{{ kind }}">{{ icon(icons.get(kind, 'dot')) }}<span>{{ label }}</span></span>
+{%- endmacro %}
+
+{% macro equipment_status(eq) -%}
+  {%- if eq.on_loan -%}{{ status('information', '借出中') }}
+  {%- elif eq.status == 'missing' -%}{{ status('negative', STATUS_LABELS['missing']) }}
+  {%- elif eq.status == 'checked_out' -%}{{ status('critical', STATUS_LABELS['checked_out']) }}
+  {%- else -%}{{ status('positive', STATUS_LABELS['in_stock']) }}{%- endif -%}
+  {%- if eq.is_damaged %} <span class="tag tag-negative">損壞</span>{% endif -%}
+{%- endmacro %}
+
+{% macro loan_status(loan) -%}
+  {%- set s = loan.display_status -%}
+  {%- if s == 'overdue' -%}{{ status('negative', LOAN_STATUS_LABELS['overdue'] ~ ' ' ~ loan.days_overdue ~ ' 日') }}
+  {%- elif s == 'active' -%}{{ status('information', LOAN_STATUS_LABELS['active']) }}
+  {%- elif s == 'partial' -%}{{ status('critical', LOAN_STATUS_LABELS['partial']) }}
+  {%- elif s == 'returned' -%}{{ status('positive', LOAN_STATUS_LABELS['returned']) }}
+  {%- else -%}{{ status('neutral', LOAN_STATUS_LABELS['cancelled']) }}{%- endif -%}
+{%- endmacro %}
+
+{% macro job_status(job) -%}
+  {%- if job.status == 'open' -%}{{ status('positive', '進行中') }}{%- else -%}{{ status('neutral', '已結束') }}{%- endif -%}
+{%- endmacro %}
+
+{% macro direction_status(direction) -%}
+  {%- if direction == 'out' -%}{{ status('critical', DIRECTION_LABELS['out']) }}{%- else -%}{{ status('positive', DIRECTION_LABELS['in']) }}{%- endif -%}
+{%- endmacro %}
+
+{% macro due_label(loan) -%}
+  {%- if loan.is_open -%}
+    {%- if loan.is_overdue -%}<span class="text-negative">{{ loan.due_date.isoformat() }}</span>
+    {%- elif loan.days_until_due == 0 -%}<span class="text-critical">{{ loan.due_date.isoformat() }}(今日)</span>
+    {%- else -%}{{ loan.due_date.isoformat() }}{%- endif -%}
+  {%- else -%}{{ loan.due_date.isoformat() }}{%- endif -%}
+{%- endmacro %}
+
+{% macro loan_link(loan) -%}<a href="{{ url_for('dashboard.loan_detail', loan_id=loan.id) }}">{{ loan.doc_no }}</a>{%- endmacro %}
+
+{% macro link_to(href, label) -%}<a href="{{ href }}">{{ label }}</a>{%- endmacro %}
+
+{% macro epc(code) -%}<code class="epc">{{ code }}</code>{%- endmacro %}
+
+{# Dense lists: the last 10 characters are what tells EPCs apart; full value on hover and to screen readers. #}
+{% macro epc_short(code) -%}
+{%- if code|length > 14 -%}<code class="epc epc-short" title="{{ code }}"><span class="sr-only">{{ code[:-10] }}</span><span aria-hidden="true">…</span>{{ code[-10:] }}</code>{%- else -%}<code class="epc">{{ code }}</code>{%- endif -%}
+{%- endmacro %}
+
+{# DynamicPageHeader. Use {% call c.page_header(...) %}actions{% endcall %}. #}
+{% macro page_header(title, subtitle=None, crumbs=None, status_html=None, facts_html=None) -%}
+<header class="page-header">
+  {% if crumbs %}
+  <nav class="breadcrumbs" aria-label="路徑">
+    <ol>
+      {% for label, href in crumbs %}
+        <li>{% if href %}<a href="{{ href }}">{{ label }}</a>{% else %}<span aria-current="page">{{ label }}</span>{% endif %}</li>
+      {% endfor %}
+    </ol>
+  </nav>
+  {% endif %}
+  <div class="page-header-row">
+    <div class="page-header-title">
+      <h1>{{ title }}</h1>
+      {% if status_html %}<div class="page-header-status">{{ status_html }}</div>{% endif %}
+      {% if subtitle %}<p class="page-subtitle">{{ subtitle }}</p>{% endif %}
+    </div>
+    <div class="page-header-actions">{{ caller() if caller else '' }}</div>
+  </div>
+  {% if facts_html %}{{ facts_html }}{% endif %}
+</header>
+{%- endmacro %}
+
+{% macro facts(items) -%}
+<dl class="facts">
+  {% for label, value in items %}
+    <div class="fact"><dt>{{ label }}</dt><dd>{{ value if value not in (None, '') else '—' }}</dd></div>
+  {% endfor %}
+</dl>
+{%- endmacro %}
+
+{% macro sort_th(key, label, sort, dir, align='') -%}
+  {% set active = sort == key %}
+  <th scope="col" class="{{ align }}" aria-sort="{{ ('ascending' if dir == 'asc' else 'descending') if active else 'none' }}">
+    <a class="sort-link" href="{{ url_args(sort=key, dir=('desc' if active and dir == 'asc' else 'asc'), page=None) }}">
+      {{ label }}{{ icon('sort-asc' if active and dir == 'asc' else ('sort-desc' if active else 'sort'), 'sort-icon' ~ (' is-active' if active else '')) }}
+    </a>
+  </th>
+{%- endmacro %}
+
+{% macro pagination(page) -%}
+{% if page.pages > 1 %}
+<nav class="pager" aria-label="分頁">
+  <span class="pager-info">第 {{ (page.page - 1) * page.per_page + 1 }}–{{ (page.page - 1) * page.per_page + page.items|length }} 項,共 {{ page.total }} 項</span>
+  <ul>
+    <li>{% if page.has_prev %}<a class="btn btn-ghost btn-sm btn-icon" href="{{ url_args(page=page.prev_num) }}" aria-label="上一頁">{{ icon('chevron-left') }}</a>{% else %}<span class="btn btn-ghost btn-sm btn-icon" aria-disabled="true">{{ icon('chevron-left') }}</span>{% endif %}</li>
+    {% for n in page.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+      {% if n %}
+        <li>{% if n == page.page %}<span class="pager-page is-current" aria-current="page">{{ n }}</span>{% else %}<a class="pager-page" href="{{ url_args(page=n) }}">{{ n }}</a>{% endif %}</li>
+      {% else %}<li><span class="pager-gap">…</span></li>{% endif %}
+    {% endfor %}
+    <li>{% if page.has_next %}<a class="btn btn-ghost btn-sm btn-icon" href="{{ url_args(page=page.next_num) }}" aria-label="下一頁">{{ icon('chevron-right') }}</a>{% else %}<span class="btn btn-ghost btn-sm btn-icon" aria-disabled="true">{{ icon('chevron-right') }}</span>{% endif %}</li>
+  </ul>
+</nav>
+{% endif %}
+{%- endmacro %}
+
+{% macro empty(title, hint=None, icon_name='box') -%}
+<div class="empty">
+  {{ icon(icon_name, 'empty-icon') }}
+  <p class="empty-title">{{ title }}</p>
+  {% if hint %}<p class="empty-hint">{{ hint }}</p>{% endif %}
+  {{ caller() if caller else '' }}
+</div>
+{%- endmacro %}
+
+{# Form field with value-state error support. #}
+{% macro field(name, label, value='', required=False, placeholder='', type='text', list=None, hint=None, maxlength=None, autofocus=False, error=False) -%}
+<div class="field{{ ' has-error' if error }}">
+  <label for="f-{{ name }}">{{ label }}{% if required %}<span class="req" title="必填">*</span>{% endif %}</label>
+  <input type="{{ type }}" id="f-{{ name }}" name="{{ name }}" value="{{ value }}" {% if required %}required{% endif %}
+         {% if placeholder %}placeholder="{{ placeholder }}"{% endif %} {% if list %}list="{{ list }}"{% endif %}
+         {% if maxlength %}maxlength="{{ maxlength }}"{% endif %} {% if autofocus %}autofocus{% endif %} autocomplete="off"
+         {% if hint %}aria-describedby="h-{{ name }}"{% endif %}>
+  {% if hint %}<p class="field-hint" id="h-{{ name }}">{{ hint }}</p>{% endif %}
+</div>
+{%- endmacro %}
+
+{% macro message_strip(kind, messages, title=None) -%}
+{% if messages %}
+{% set icons = {'error': 'error', 'warning': 'warning', 'success': 'success', 'info': 'info'} %}
+<div class="strip strip-{{ kind }}" role="{{ 'alert' if kind == 'error' else 'status' }}">
+  {{ icon(icons[kind], 'strip-icon') }}
+  <div class="strip-body">
+    {% if title %}<strong>{{ title }}</strong>{% endif %}
+    {% if messages|length == 1 %}<span>{{ messages[0] }}</span>
+    {% else %}<ul>{% for m in messages %}<li>{{ m }}</li>{% endfor %}</ul>{% endif %}
+  </div>
+</div>
+{% endif %}
+{%- endmacro %}
+
+{# Change documents table. show_object adds the object column (global change log). #}
+{% macro audit_table(entries, show_object=False) -%}
+{% if entries %}
+<div class="table-wrap">
+<table class="data">
+  <thead><tr>
+    <th scope="col">時間</th>
+    {% if show_object %}<th scope="col">對象</th>{% endif %}
+    <th scope="col">動作</th><th scope="col">內容</th><th scope="col">來源</th>
+  </tr></thead>
+  <tbody>
+    {% for a in entries %}
+    <tr>
+      <td class="nowrap tnum" title="{{ a.created_at|ldt }}">{{ a.created_at|ldt }}</td>
+      {% if show_object %}
+      <td>
+        {% set url = entity_url(a) %}
+        <span class="text-muted">{{ ENTITY_TYPES.get(a.entity_type, a.entity_type) }}</span>
+        {% if url %}<a href="{{ url }}">{{ a.entity_label or a.doc_no }}</a>{% else %}{{ a.entity_label or a.doc_no }}{% endif %}
+      </td>
+      {% endif %}
+      <td class="nowrap">{{ AUDIT_ACTIONS.get(a.action, a.action) }}</td>
+      <td>{{ a.summary }}</td>
+      <td class="nowrap text-muted">{{ AUDIT_SOURCES.get(a.source, a.source) }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+{% else %}
+  {{ empty('未有變更紀錄', '之後對呢個項目嘅每次變更都會記錄喺度。', 'doc') }}
+{% endif %}
+{%- endmacro %}
+
+{# Delete / destructive button wired to the confirm dialog. #}
+{% macro confirm_button(action, label, message, cls='btn btn-negative', confirm_label='確定', field_name=None, field_value=None) -%}
+<form method="post" action="{{ action }}" class="inline-form" data-confirm="{{ message }}" data-confirm-label="{{ confirm_label }}">
+  {{ csrf() }}
+  {% if field_name %}<input type="hidden" name="{{ field_name }}" value="{{ field_value }}">{% endif %}
+  <button type="submit" class="{{ cls }}">{{ label }}</button>
+</form>
+{%- endmacro %}
