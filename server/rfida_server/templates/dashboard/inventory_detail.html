@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% import "_components.html" as c with context %}
+{% block title %}{{ s.doc_no }}{% endblock %}
+{% block content %}
+{{ c.page_header('盤點 ' ~ s.doc_no, s.batch_label or None,
+    [('首頁', url_for('dashboard.index')), ('盤點紀錄', url_for('dashboard.inventory_list')), (s.doc_no, None)],
+    None,
+    c.facts([
+      ('單號', s.doc_no),
+      ('盤點時間', s.timestamp|ldt),
+      ('批次', s.batch_label),
+      ('公司', c.link_to(url_for('dashboard.company_detail', company_id=s.company.id), s.company.name) if s.company else None),
+      ('已知器材', known|length),
+      ('未知標籤', unknown|length)
+    ])) }}
+
+<div class="page-body">
+  {% if unknown %}
+  <section class="panel">
+    <div class="panel-head">
+      <h2 class="panel-title">未知標籤 <span class="panel-count">({{ unknown|length }})</span></h2>
+      <span class="text-muted">主檔未登記,可以直接登記</span>
+    </div>
+    <ul class="list-plain">
+      {% for epc_code in unknown %}
+      <li>{{ c.epc(epc_code) }}<a class="btn btn-sm" href="{{ url_for('dashboard.equipment_create', epc=epc_code) }}">{{ c.icon('plus') }}登記呢個標籤</a></li>
+      {% endfor %}
+    </ul>
+  </section>
+  {% endif %}
+
+  <section class="panel">
+    <div class="panel-head"><h2 class="panel-title">已識別器材 <span class="panel-count">({{ known|length }})</span></h2></div>
+    {% if known %}
+    <div class="table-wrap">
+      <table class="data">
+        <thead><tr><th scope="col">器材</th><th scope="col">分類</th><th scope="col">EPC</th><th scope="col">位置</th><th scope="col">現況</th></tr></thead>
+        <tbody>
+          {% for eq in known %}
+          <tr data-href="{{ url_for('dashboard.equipment_detail', equipment_id=eq.id) }}">
+            <td><a class="row-link" href="{{ url_for('dashboard.equipment_detail', equipment_id=eq.id) }}">{{ eq.name }}</a></td>
+            <td>{{ eq.category or '—' }}</td>
+            <td class="nowrap">{{ c.epc_short(eq.epc) }}</td>
+            <td>{{ eq.location or '—' }}</td>
+            <td>{{ c.equipment_status(eq) }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}{{ c.empty('呢批冇識別到已登記器材', None, 'scan') }}{% endif %}
+  </section>
+
+  <section class="panel">
+    <div class="panel-head"><h2 class="panel-title">變更紀錄</h2></div>
+    {{ c.audit_table(audit) }}
+  </section>
+</div>
+{% endblock %}

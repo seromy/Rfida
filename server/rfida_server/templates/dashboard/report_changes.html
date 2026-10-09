@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% import "_components.html" as c with context %}
+{% block title %}變更紀錄{% endblock %}
+{% block content %}
+{{ c.page_header('變更紀錄', '每個項目嘅建立、修改、狀態變更都有紀錄(變更文件)', [('首頁', url_for('dashboard.index')), ('報表', None), ('變更紀錄', None)]) }}
+
+<div class="page-body">
+  <form class="filterbar" method="get" role="search" aria-label="變更紀錄篩選">
+    <div class="filter-grid">
+      <div class="field field-wide">
+        <label for="f-q">搜尋</label>
+        <input type="search" id="f-q" name="q" value="{{ q }}" placeholder="內容 / 對象名稱">
+      </div>
+      <div class="field">
+        <label for="f-entity">對象類型</label>
+        <select id="f-entity" name="entity">
+          <option value="">全部</option>
+          {% for key, label in entity_types.items() %}<option value="{{ key }}" {{ 'selected' if entity == key }}>{{ label }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="field">
+        <label for="f-action">動作</label>
+        <select id="f-action" name="action">
+          <option value="">全部</option>
+          {% for key, label in actions.items() %}<option value="{{ key }}" {{ 'selected' if action == key }}>{{ label }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="field">
+        <label for="f-source">來源</label>
+        <select id="f-source" name="source">
+          <option value="">全部</option>
+          {% for key, label in sources.items() %}<option value="{{ key }}" {{ 'selected' if source == key }}>{{ label }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="field"><label for="f-date_from">由</label><input type="date" id="f-date_from" name="date_from" value="{{ date_from }}"></div>
+      <div class="field"><label for="f-date_to">至</label><input type="date" id="f-date_to" name="date_to" value="{{ date_to }}"></div>
+      <div class="filter-actions">
+        <button class="btn btn-primary" type="submit">{{ c.icon('search') }}查詢</button>
+        <a class="btn btn-ghost" href="{{ url_for('dashboard.report_changes') }}">{{ c.icon('reset') }}重設</a>
+      </div>
+    </div>
+  </form>
+
+  <section class="panel" aria-labelledby="list-title">
+    <div class="panel-head"><h2 class="panel-title" id="list-title">變更紀錄 <span class="panel-count">({{ page.total }})</span></h2></div>
+    {{ c.audit_table(items, True) }}
+    {{ c.pagination(page) }}
+  </section>
+</div>
+{% endblock %}

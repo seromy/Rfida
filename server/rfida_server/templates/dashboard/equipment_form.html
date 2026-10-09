@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% import "_components.html" as c with context %}
+{% set editing = equipment is not none %}
+{% block title %}{{ '編輯器材' if editing else '登記器材' }}{% endblock %}
+{% block content %}
+{{ c.page_header(
+    ('編輯 ' ~ equipment.name) if editing else '登記器材',
+    ('器材編號 ' ~ equipment.doc_no) if editing else '將 RFID 標籤(EPC)同器材資料配對',
+    [('首頁', url_for('dashboard.index')), ('器材', url_for('dashboard.equipment_list'))] + ([(equipment.name, url_for('dashboard.equipment_detail', equipment_id=equipment.id)), ('編輯', None)] if editing else [('登記', None)])) }}
+
+<div class="page-body">
+  <form method="post" novalidate>
+    {{ c.csrf() }}
+    {{ c.message_strip('error', errors, '未能儲存,請修正以下問題:') }}
+
+    <section class="panel">
+      <div class="panel-head"><h2 class="panel-title">器材資料</h2></div>
+      <div class="panel-body">
+        <div class="form-grid">
+          <div class="field-full">
+            {{ c.field('epc', 'EPC(標籤編碼)', form.epc, required=True, placeholder='E2801160600002042BB8A1C3', maxlength=128, autofocus=(not editing),
+                       hint='用手提機掃描,或者直接貼上。系統會自動轉做大寫。' if not editing else '更換標籤時可修改 EPC;舊 EPC 會留喺變更紀錄。') }}
+          </div>
+          {{ c.field('name', '器材名稱', form.name, required=True, placeholder='Sony A7IV 機身', maxlength=200, autofocus=editing) }}
+          {{ c.field('category', '分類', form.category, placeholder='機身 / 鏡頭 / 燈光', list='categories', maxlength=100) }}
+          {{ c.field('serial_number', '序號', form.serial_number, placeholder='1234567', maxlength=100) }}
+          {{ c.field('location', '存放位置', form.location, placeholder='A 櫃', list='locations', maxlength=100) }}
+          <div class="field field-full">
+            <label for="f-note">備註</label>
+            <textarea id="f-note" name="note" maxlength="2000" placeholder="配件、購入日期、保養紀錄…">{{ form.note }}</textarea>
+          </div>
+        </div>
+        <datalist id="categories">{% for v in categories %}<option value="{{ v }}">{% endfor %}</datalist>
+        <datalist id="locations">{% for v in locations %}<option value="{{ v }}">{% endfor %}</datalist>
+      </div>
+    </section>
+
+    <div class="form-footer">
+      <a class="btn btn-ghost" href="{{ url_for('dashboard.equipment_detail', equipment_id=equipment.id) if editing else url_for('dashboard.equipment_list') }}">取消</a>
+      <button type="submit" class="btn btn-primary">{{ '儲存' if editing else '登記' }}</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

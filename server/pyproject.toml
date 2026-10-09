@@ -1,7 +1,16 @@
 [project]
-name = "server"
-version = "0.1.0"
-description = "Add your description here"
+name = "rfida-server"
+version = "0.2.0"
+description = "Rfida 器材出入管理後台:handheld REST API + SAP Fiori 風格網頁後台(含器材借出服務)"
 readme = "README.md"
 requires-python = ">=3.13"
-dependencies = []
+dependencies = [
+    "Flask==3.0.3",
+    "Flask-SQLAlchemy==3.1.1",
+]
+
+[dependency-groups]
+dev = ["pytest>=8"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

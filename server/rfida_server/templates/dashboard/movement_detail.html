@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% import "_components.html" as c with context %}
+{% block title %}{{ mv.doc_no }}{% endblock %}
+{% block content %}
+{{ c.page_header(mv.doc_no ~ ' · ' ~ DIRECTION_LABELS[mv.direction], None,
+    [('首頁', url_for('dashboard.index')), ('出入紀錄', url_for('dashboard.movement_list')), (mv.doc_no, None)],
+    c.direction_status(mv.direction),
+    c.facts([
+      ('單號', mv.doc_no),
+      ('時間', mv.created_at|ldt),
+      ('Job', c.link_to(url_for('dashboard.job_detail', job_id=mv.job.id), mv.job.name) if mv.job else None),
+      ('公司', c.link_to(url_for('dashboard.company_detail', company_id=mv.company.id), mv.company.name) if mv.company else None),
+      ('掃描數量', scanned|length),
+      ('缺件', missing|length if mv.missing_epcs is not none else None),
+      ('備註', mv.note)
+    ])) }}
+
+<div class="page-body">
+  <section class="panel">
+    <div class="panel-head"><h2 class="panel-title">已掃描器材 <span class="panel-count">({{ scanned|length }})</span></h2></div>
+    {% if scanned %}
+    <div class="table-wrap">
+      <table class="data">
+        <thead><tr><th scope="col">器材</th><th scope="col">EPC</th><th scope="col">分類</th><th scope="col">現況</th></tr></thead>
+        <tbody>
+          {% for epc_code, eq in scanned %}
+          <tr>
+            <td>{% if eq %}<a class="row-link" href="{{ url_for('dashboard.equipment_detail', equipment_id=eq.id) }}">{{ eq.name }}</a>{% else %}{{ c.status('critical', '未登記標籤') }}{% endif %}</td>
+            <td>{{ c.epc(epc_code) }}</td>
+            <td>{{ eq.category if eq and eq.category else '—' }}</td>
+            <td>{% if eq %}{{ c.equipment_status(eq) }}{% else %}<a class="btn btn-sm" href="{{ url_for('dashboard.equipment_create', epc=epc_code) }}">登記</a>{% endif %}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}{{ c.empty('呢張單冇掃描任何器材', None, 'scan') }}{% endif %}
+  </section>
+
+  {% if mv.missing_epcs %}
+  <section class="panel">
+    <div class="panel-head"><h2 class="panel-title">缺件 <span class="panel-count">({{ missing|length }})</span></h2></div>
+    <div class="table-wrap">
+      <table class="data">
+        <thead><tr><th scope="col">器材</th><th scope="col">EPC</th><th scope="col">現況</th></tr></thead>
+        <tbody>
+          {% for epc_code, eq in missing %}
+          <tr>
+            <td>{% if eq %}<a class="row-link" href="{{ url_for('dashboard.equipment_detail', equipment_id=eq.id) }}">{{ eq.name }}</a>{% else %}未登記標籤{% endif %}</td>
+            <td>{{ c.epc(epc_code) }}</td>
+            <td>{% if eq %}{{ c.equipment_status(eq) }}{% else %}—{% endif %}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+  {% endif %}
+
+  <section class="panel">
+    <div class="panel-head"><h2 class="panel-title">變更紀錄</h2></div>
+    {{ c.audit_table(audit) }}
+  </section>
+</div>
+{% endblock %}

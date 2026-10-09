@@ -1,96 +1,102 @@
 {% extends "base.html" %}
-{% import "_macros.html" as m %}
+{% import "_components.html" as c with context %}
 {% block title %}器材{% endblock %}
 {% block content %}
+{% call c.page_header('器材', '器材主檔:每件器材配對一個 RFID 標籤(EPC)', [('首頁', url_for('dashboard.index')), ('器材', None)]) %}
+  <a class="btn btn-ghost" href="{{ url_for('dashboard.equipment_export', **request.args) }}">{{ c.icon('download') }}匯出 CSV</a>
+  <a class="btn btn-primary" href="{{ url_for('dashboard.equipment_create') }}">{{ c.icon('plus') }}登記器材</a>
+{% endcall %}
 
-<div class="page-header">
-  <div>
-    <div class="eyebrow">器材主檔</div>
-    <h1>器材清單</h1>
-  </div>
-</div>
-
-<div class="card">
-  <h3>登記新器材</h3>
-  <form method="post" action="{{ url_for('dashboard.equipment_create') }}">
-    <div class="form-row">
-      <div class="field">
-        <label for="epc">EPC</label>
-        <input type="text" id="epc" name="epc" placeholder="E2801160600002042BB8A1C3" required>
+<div class="page-body">
+  <form class="filterbar" method="get" role="search" aria-label="器材篩選">
+    <div class="filter-grid">
+      <div class="field field-wide">
+        <label for="f-q">搜尋</label>
+        <input type="search" id="f-q" name="q" value="{{ q }}" placeholder="名稱 / EPC / 序號 / 分類 / 位置">
       </div>
       <div class="field">
-        <label for="name">器材名稱</label>
-        <input type="text" id="name" name="name" placeholder="Sony A7IV 機身" required>
+        <label for="f-category">分類</label>
+        <select id="f-category" name="category">
+          <option value="">全部</option>
+          {% for cat in categories %}<option value="{{ cat }}" {{ 'selected' if cat == category }}>{{ cat }}</option>{% endfor %}
+        </select>
       </div>
       <div class="field">
-        <label for="category">分類</label>
-        <input type="text" id="category" name="category" placeholder="機身 / 鏡頭 / 燈光">
+        <label for="f-location">存放位置</label>
+        <select id="f-location" name="location">
+          <option value="">全部</option>
+          {% for loc in locations %}<option value="{{ loc }}" {{ 'selected' if loc == location }}>{{ loc }}</option>{% endfor %}
+        </select>
       </div>
-      <div class="field">
-        <label for="serialNumber">序號</label>
-        <input type="text" id="serialNumber" name="serialNumber" placeholder="1234567">
+      <input type="hidden" name="status" value="{{ status }}">
+      <div class="filter-actions">
+        <button class="btn btn-primary" type="submit">{{ c.icon('search') }}查詢</button>
+        <a class="btn btn-ghost" href="{{ url_for('dashboard.equipment_list') }}">{{ c.icon('reset') }}重設</a>
       </div>
     </div>
-    <button class="btn" type="submit">登記</button>
   </form>
-</div>
 
-<div class="card card-flush">
-  <div style="padding: 20px 20px 0;">
-    <form class="filter-bar" method="get">
-      <input type="text" name="q" value="{{ q }}" placeholder="搜尋名稱 / EPC / 序號 / 分類" style="max-width: 280px;">
-      <div class="pill-nav">
-        <a href="{{ url_for('dashboard.equipment_list', q=q) }}" class="{{ 'active' if not status }}">全部</a>
-        <a href="{{ url_for('dashboard.equipment_list', q=q, status='in_stock') }}" class="{{ 'active' if status == 'in_stock' }}">在庫</a>
-        <a href="{{ url_for('dashboard.equipment_list', q=q, status='checked_out') }}" class="{{ 'active' if status == 'checked_out' }}">已出Job</a>
-        <a href="{{ url_for('dashboard.equipment_list', q=q, status='missing') }}" class="{{ 'active' if status == 'missing' }}">遺失</a>
+  <nav class="quick-filters" aria-label="按狀態篩選">
+    {% set tabs = [('', '全部', counts.total, ''), ('in_stock', '在庫', counts.in_stock, ''), ('checked_out', '已出 Job', counts.checked_out, ''), ('on_loan', '借出中', counts.on_loan, ''), ('missing', '遺失', counts.missing, 'is-alert'), ('damaged', '損壞', counts.damaged, 'is-alert')] %}
+    {% for key, label, n, cls in tabs %}
+      <a class="qf {{ cls if n }}" href="{{ url_args(status=key, page=None) }}" {% if status == key %}aria-current="true"{% endif %}>{{ label }}<span class="qf-count">{{ n }}</span></a>
+    {% endfor %}
+  </nav>
+
+  <section class="panel" aria-labelledby="list-title">
+    <div class="panel-head">
+      <h2 class="panel-title" id="list-title">器材清單 <span class="panel-count">({{ page.total }})</span></h2>
+      <div class="panel-tools">
+        <form id="bulk-loan" method="get" action="{{ url_for('dashboard.loan_create') }}" class="inline-form"></form>
+        <button type="submit" form="bulk-loan" class="btn btn-sm" data-needs-selection="equipment" disabled>{{ c.icon('loan') }}借出所選 (<span data-select-count="equipment">0</span>)</button>
       </div>
-      <button class="btn btn-ghost btn-sm" type="submit">搜尋</button>
-    </form>
-  </div>
+    </div>
 
-  {% if items %}
-  <table>
-    <thead>
-      <tr>
-        <th>器材</th>
-        <th>分類</th>
-        <th>EPC</th>
-        <th>序號</th>
-        <th>狀態</th>
-        <th>最後偵測</th>
-        <th></th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for eq in items %}
-      <tr>
-        <td>{{ eq.name }}</td>
-        <td>{{ eq.category or '—' }}</td>
-        <td class="mono">{{ eq.epc }}</td>
-        <td>{{ eq.serial_number or '—' }}</td>
-        <td>{{ m.equipment_status_badge(eq.status) }}</td>
-        <td>{{ eq.last_seen_at.strftime('%Y-%m-%d %H:%M') if eq.last_seen_at else '—' }}</td>
-        <td style="text-align:right; white-space:nowrap;">
-          <form method="post" action="{{ url_for('dashboard.equipment_update_status', equipment_id=eq.id) }}" style="display:inline;">
-            <select name="status" onchange="this.form.submit()" style="width:auto; display:inline-block; padding:4px 8px; font-size:0.78rem;">
-              <option value="">變更狀態…</option>
-              <option value="in_stock" {{ 'selected' if eq.status == 'in_stock' }}>在庫</option>
-              <option value="checked_out" {{ 'selected' if eq.status == 'checked_out' }}>已出Job</option>
-              <option value="missing" {{ 'selected' if eq.status == 'missing' }}>遺失</option>
-            </select>
-          </form>
-          <form method="post" action="{{ url_for('dashboard.equipment_delete', equipment_id=eq.id) }}" style="display:inline;" onsubmit="return confirm('確定刪除「{{ eq.name }}」?');">
-            <button class="btn btn-ghost btn-sm" type="submit">刪除</button>
-          </form>
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-  {% else %}
-    <div class="empty-state">未有符合嘅器材</div>
-  {% endif %}
+    {% if items %}
+    <div class="table-wrap">
+      <table class="data">
+        <thead>
+          <tr>
+            <th scope="col" class="sel"><input type="checkbox" data-select-all="equipment" aria-label="全選本頁可借出器材"></th>
+            {{ c.sort_th('name', '器材', sort, dir) }}
+            {{ c.sort_th('category', '分類', sort, dir) }}
+            {{ c.sort_th('epc', 'EPC', sort, dir) }}
+            {{ c.sort_th('location', '位置', sort, dir) }}
+            {{ c.sort_th('status', '狀態', sort, dir) }}
+            {{ c.sort_th('seen', '最後偵測', sort, dir) }}
+          </tr>
+        </thead>
+        <tbody>
+          {% for eq in items %}
+          {% set open_item = eq.open_loan_item %}
+          <tr data-href="{{ url_for('dashboard.equipment_detail', equipment_id=eq.id) }}">
+            <td class="sel">
+              <input type="checkbox" name="equipment" value="{{ eq.id }}" form="bulk-loan" data-select="equipment"
+                     aria-label="揀選 {{ eq.name }}" {{ 'disabled' if eq.status != 'in_stock' or eq.is_damaged or open_item }}>
+            </td>
+            <td>
+              <a class="row-link" href="{{ url_for('dashboard.equipment_detail', equipment_id=eq.id) }}">{{ eq.name }}</a>
+              <span class="cell-sub">{{ eq.doc_no }}{% if eq.serial_number %} · 序號 {{ eq.serial_number }}{% endif %}</span>
+            </td>
+            <td>{{ eq.category or '—' }}</td>
+            <td class="nowrap">{{ c.epc_short(eq.epc) }}</td>
+            <td>{{ eq.location or '—' }}</td>
+            <td>
+              {{ c.equipment_status(eq) }}
+              {% if open_item %}<span class="cell-sub"><a href="{{ url_for('dashboard.loan_detail', loan_id=open_item.loan_id) }}">{{ open_item.loan.doc_no }}</a> · 到期 {{ open_item.loan.due_date.isoformat() }}</span>{% endif %}
+            </td>
+            <td class="nowrap tnum">{{ eq.last_seen_at|ldt }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {{ c.pagination(page) }}
+    {% else %}
+      {% call c.empty('搵唔到符合嘅器材', '試下放寬篩選條件,或者登記新器材。', 'box') %}
+        <a class="btn" href="{{ url_for('dashboard.equipment_list') }}">清除篩選</a>
+      {% endcall %}
+    {% endif %}
+  </section>
 </div>
-
 {% endblock %}

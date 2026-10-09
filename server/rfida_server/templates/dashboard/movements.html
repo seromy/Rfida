@@ -1,39 +1,84 @@
 {% extends "base.html" %}
-{% import "_macros.html" as m %}
+{% import "_components.html" as c with context %}
 {% block title %}出入紀錄{% endblock %}
 {% block content %}
+{% call c.page_header('出入紀錄', '手提機提交嘅出 Job / 歸還單據', [('首頁', url_for('dashboard.index')), ('出入紀錄', None)]) %}
+  <a class="btn btn-ghost" href="{{ url_for('dashboard.movement_export', **request.args) }}">{{ c.icon('download') }}匯出 CSV</a>
+{% endcall %}
 
-<div class="page-header">
-  <div>
-    <div class="eyebrow">歷史紀錄</div>
-    <h1>出入紀錄</h1>
-  </div>
+<div class="page-body">
+  <form class="filterbar" method="get" role="search" aria-label="出入紀錄篩選">
+    <div class="filter-grid">
+      <div class="field field-wide">
+        <label for="f-q">搜尋</label>
+        <input type="search" id="f-q" name="q" value="{{ q }}" placeholder="單號 / EPC / Job / 公司 / 備註">
+      </div>
+      <div class="field">
+        <label for="f-direction">方向</label>
+        <select id="f-direction" name="direction">
+          <option value="">全部</option>
+          <option value="out" {{ 'selected' if direction == 'out' }}>出 Job</option>
+          <option value="in" {{ 'selected' if direction == 'in' }}>歸還</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="f-job_id">Job</label>
+        <select id="f-job_id" name="job_id">
+          <option value="">全部</option>
+          {% for j in jobs %}<option value="{{ j.id }}" {{ 'selected' if job_id == j.id|string }}>{{ j.name }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="field">
+        <label for="f-company_id">公司</label>
+        <select id="f-company_id" name="company_id">
+          <option value="">全部</option>
+          {% for co in companies %}<option value="{{ co.id }}" {{ 'selected' if company_id == co.id|string }}>{{ co.name }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="field"><label for="f-date_from">由</label><input type="date" id="f-date_from" name="date_from" value="{{ date_from }}"></div>
+      <div class="field"><label for="f-date_to">至</label><input type="date" id="f-date_to" name="date_to" value="{{ date_to }}"></div>
+      <div class="filter-actions">
+        <button class="btn btn-primary" type="submit">{{ c.icon('search') }}查詢</button>
+        <a class="btn btn-ghost" href="{{ url_for('dashboard.movement_list') }}">{{ c.icon('reset') }}重設</a>
+      </div>
+    </div>
+  </form>
+
+  <section class="panel" aria-labelledby="list-title">
+    <div class="panel-head"><h2 class="panel-title" id="list-title">出入紀錄 <span class="panel-count">({{ page.total }})</span></h2></div>
+    {% if items %}
+    <div class="table-wrap">
+      <table class="data">
+        <thead>
+          <tr>
+            {{ c.sort_th('id', '單號', sort, dir) }}
+            {{ c.sort_th('created', '時間', sort, dir) }}
+            {{ c.sort_th('direction', '方向', sort, dir) }}
+            <th scope="col">Job</th>
+            <th scope="col">公司</th>
+            <th scope="col" class="num">數量</th>
+            <th scope="col">缺件</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for mv in items %}
+          <tr data-href="{{ url_for('dashboard.movement_detail', movement_id=mv.id) }}">
+            <td class="nowrap"><a class="row-link" href="{{ url_for('dashboard.movement_detail', movement_id=mv.id) }}">{{ mv.doc_no }}</a></td>
+            <td class="nowrap tnum">{{ mv.created_at|ldt }}</td>
+            <td>{{ c.direction_status(mv.direction) }}</td>
+            <td>{% if mv.job %}<a href="{{ url_for('dashboard.job_detail', job_id=mv.job.id) }}">{{ mv.job.name }}</a>{% else %}—{% endif %}</td>
+            <td>{{ mv.company.name if mv.company else '—' }}</td>
+            <td class="num">{{ (mv.epcs or [])|length }}</td>
+            <td>{% if mv.missing_epcs %}{{ c.status('negative', (mv.missing_epcs|length) ~ ' 件') }}{% else %}—{% endif %}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {{ c.pagination(page) }}
+    {% else %}
+      {% call c.empty('搵唔到出入紀錄', '手提機提交單據後,會顯示喺度。', 'swap') %}<a class="btn" href="{{ url_for('dashboard.movement_list') }}">清除篩選</a>{% endcall %}
+    {% endif %}
+  </section>
 </div>
-
-<div class="card card-flush">
-  {% if items %}
-  <table>
-    <thead>
-      <tr><th>時間</th><th>Job</th><th>公司</th><th>方向</th><th>EPC</th><th>備註</th></tr>
-    </thead>
-    <tbody>
-      {% for mv in items %}
-      <tr>
-        <td>{{ mv.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
-        <td>{% if mv.job %}<a href="{{ url_for('dashboard.job_detail', job_id=mv.job.id) }}">{{ mv.job.name }}</a>{% else %}—{% endif %}</td>
-        <td>{{ mv.company.name if mv.company else '—' }}</td>
-        <td>{{ m.direction_badge(mv.direction) }}</td>
-        <td>{{ m.epc_list(mv.epcs) }}
-          {% if mv.missing_epcs %}<br><span class="badge badge-missing">缺件</span> {{ m.epc_list(mv.missing_epcs) }}{% endif %}
-        </td>
-        <td class="text-muted">{{ mv.note or '—' }}</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-  {% else %}
-    <div class="empty-state">未有出入紀錄</div>
-  {% endif %}
-</div>
-
 {% endblock %}

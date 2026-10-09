@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+{% import "_components.html" as c with context %}
+{% block title %}{{ eq.name }}{% endblock %}
+{% block content %}
+{% set available = eq.status == 'in_stock' and not eq.is_damaged and not loan_item %}
+{% call c.page_header(eq.name, 'EPC ' ~ eq.epc,
+    [('首頁', url_for('dashboard.index')), ('器材', url_for('dashboard.equipment_list')), (eq.doc_no, None)],
+    c.equipment_status(eq),
+    c.facts([
+      ('器材編號', eq.doc_no),
+      ('分類', eq.category),
+      ('序號', eq.serial_number),
+      ('存放位置', eq.location),
+      ('最後偵測', eq.last_seen_at|ldt if eq.last_seen_at else None),
+      ('現行借出單', c.loan_link(loan_item.loan) if loan_item else None)
+    ])) %}
+  {% if available %}<a class="btn" href="{{ url_for('dashboard.loan_create', equipment=eq.id) }}">{{ c.icon('loan') }}借出</a>{% endif %}
+  <a class="btn" href="{{ url_for('dashboard.equipment_edit', equipment_id=eq.id) }}">{{ c.icon('edit') }}編輯</a>
+  {% if loan_history %}
+    <button type="button" class="btn btn-negative" disabled title="有借出紀錄,不可刪除(保留紀錄完整性)">刪除</button>
+  {% else %}
+    {{ c.confirm_button(url_for('dashboard.equipment_delete', equipment_id=eq.id), '刪除', '確定刪除「' ~ eq.name ~ '」?刪除後無法還原。', 'btn btn-negative', '刪除') }}
+  {% endif %}
+{% endcall %}
+
+<div class="tabbar" role="tablist" aria-label="器材資料分頁" data-tabs>
+  <button type="button" role="tab" class="tab" id="tab-general" aria-controls="panel-general" aria-selected="true">一般資料</button>
+  <button type="button" role="tab" class="tab" id="tab-loans" aria-controls="panel-loans" aria-selected="false">借出紀錄<span class="tab-count">{{ loan_history|length }}</span></button>
+  <button type="button" role="tab" class="tab" id="tab-movements" aria-controls="panel-movements" aria-selected="false">出入紀錄<span class="tab-count">{{ movements|length }}</span></button>
+  <button type="button" role="tab" class="tab" id="tab-changes" aria-controls="panel-changes" aria-selected="false">變更紀錄<span class="tab-count">{{ audit|length }}</span></button>
+</div>
+
+<div class="page-body">
+  <div role="tabpanel" id="panel-general" aria-labelledby="tab-general">
+    <div class="cols-2">
+      <section class="panel">
+        <div class="panel-head"><h2 class="panel-title">器材資料</h2></div>
+        <div class="panel-body">
+          {{ c.facts([
+            ('EPC', c.epc(eq.epc)),
+            ('器材名稱', eq.name),
+            ('分類', eq.category),
+            ('序號', eq.serial_number),
+            ('存放位置', eq.location),
+            ('狀況', CONDITION_LABELS[eq.condition]),
+            ('登記時間', eq.created_at|ldt if eq.created_at else None),
+            ('最後更新', eq.updated_at|ldt if eq.updated_at else None),
+          ]) }}
+          {% if eq.note %}<p class="section-label">備註</p><p style="white-space:pre-line">{{ eq.note }}</p>{% endif %}
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head"><h2 class="panel-title">狀態管理</h2></div>
+        <div class="panel-body">
+          {% if loan_item %}
+            {{ c.message_strip('info', ['呢件器材喺借出單 ' ~ loan_item.loan.doc_no ~ ' 借出中,請喺借出單辦理歸還。']) }}
+            <a class="btn" href="{{ url_for('dashboard.loan_detail', loan_id=loan_item.loan_id) }}">前往 {{ loan_item.loan.doc_no }}</a>
+          {% else %}
+          <form method="post" action="{{ url_for('dashboard.equipment_status', equipment_id=eq.id) }}">
+            {{ c.csrf() }}
+            <div class="form-grid">
+              <div class="field">
+                <label for="f-status">變更狀態為</label>
+                <select id="f-status" name="status">
+                  {% for key, label in status_labels.items() if key != eq.status %}<option value="{{ key }}">{{ label }}</option>{% endfor %}
+                </select>
+              </div>
+              <div class="field">
+                <label for="f-reason">原因(選填)</label>
+                <input type="text" id="f-reason" name="reason" maxlength="200" placeholder="例如:盤點發現" autocomplete="off">
+              </div>
+            </div>
+            <button class="btn" type="submit">更新狀態</button>
+          </form>
+          {% endif %}
+          <hr style="border:0;border-top:1px solid var(--line-soft);margin:1rem 0">
+          <form method="post" action="{{ url_for('dashboard.equipment_condition', equipment_id=eq.id) }}">
+            {{ c.csrf() }}
+            {% if eq.is_damaged %}
+              <input type="hidden" name="condition" value="good">
+              <p>呢件器材標記為<strong>損壞</strong>,暫時不可借出。</p>
+              <button class="btn" type="submit">{{ c.icon('check') }}標記為已修復</button>
+            {% else %}
+              <input type="hidden" name="condition" value="damaged">
+              <p>如器材需要維修,標記損壞後會暫停借出。</p>
+              <button class="btn btn-negative" type="submit">{{ c.icon('warning') }}標記為損壞</button>
+            {% endif %}
+          </form>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <div role="tabpanel" id="panel-loans" aria-labelledby="tab-loans" hidden>
+    <section class="panel">
+      <div class="panel-head"><h2 class="panel-title">借出紀錄 <span class="panel-count">({{ loan_history|length }})</span></h2></div>
+      {% if loan_history %}
+      <div class="table-wrap">
+        <table class="data">
+          <thead><tr><th scope="col">借出單</th><th scope="col">借用人</th><th scope="col">借出日期</th><th scope="col">到期日</th><th scope="col">歸還</th></tr></thead>
+          <tbody>
+            {% for li in loan_history %}
+            <tr data-href="{{ url_for('dashboard.loan_detail', loan_id=li.loan_id) }}">
+              <td class="nowrap"><a class="row-link" href="{{ url_for('dashboard.loan_detail', loan_id=li.loan_id) }}">{{ li.loan.doc_no }}</a></td>
+              <td>{{ li.loan.borrower_display }}</td>
+              <td class="nowrap tnum">{{ li.loan.loan_date|ldate }}</td>
+              <td class="nowrap tnum">{{ li.loan.due_date.isoformat() }}</td>
+              <td>
+                {% if li.state == 'out' %}{{ c.status('information', '借出中') }}
+                {% elif li.state == 'cancelled' %}{{ c.status('neutral', '已取消') }}
+                {% else %}{{ c.status('positive' if li.return_condition == 'good' else 'negative', '已歸還・' ~ CONDITION_LABELS.get(li.return_condition, '')) }}
+                  <span class="cell-sub">{{ li.returned_at|ldt }}</span>{% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}{{ c.empty('呢件器材未有借出紀錄', None, 'loan') }}{% endif %}
+    </section>
+  </div>
+
+  <div role="tabpanel" id="panel-movements" aria-labelledby="tab-movements" hidden>
+    <section class="panel">
+      <div class="panel-head"><h2 class="panel-title">出入紀錄 <span class="panel-count">({{ movements|length }})</span></h2></div>
+      {% if movements %}
+      <div class="table-wrap">
+        <table class="data">
+          <thead><tr><th scope="col">單號</th><th scope="col">時間</th><th scope="col">方向</th><th scope="col">Job</th><th scope="col">結果</th></tr></thead>
+          <tbody>
+            {% for mv in movements %}
+            <tr data-href="{{ url_for('dashboard.movement_detail', movement_id=mv.id) }}">
+              <td class="nowrap"><a class="row-link" href="{{ url_for('dashboard.movement_detail', movement_id=mv.id) }}">{{ mv.doc_no }}</a></td>
+              <td class="nowrap tnum">{{ mv.created_at|ldt }}</td>
+              <td>{{ c.direction_status(mv.direction) }}</td>
+              <td>{{ mv.job.name if mv.job else '—' }}</td>
+              <td>{% if eq.epc in (mv.missing_epcs or []) %}{{ c.status('negative', '缺件') }}{% else %}{{ c.status('positive', '已掃描') }}{% endif %}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}{{ c.empty('未有出入紀錄', None, 'swap') }}{% endif %}
+    </section>
+  </div>
+
+  <div role="tabpanel" id="panel-changes" aria-labelledby="tab-changes" hidden>
+    <section class="panel">
+      <div class="panel-head"><h2 class="panel-title">變更紀錄 <span class="panel-count">({{ audit|length }})</span></h2></div>
+      {{ c.audit_table(audit) }}
+    </section>
+  </div>
+</div>
+{% endblock %}

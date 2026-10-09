@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>借用單 {{ loan.doc_no }}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <script src="{{ url_for('static', filename='js/app.js') }}" defer></script>
+</head>
+<body>
+  {% include "_icons.html" %}
+  <div class="print-toolbar">
+    <button type="button" class="btn btn-primary" data-print>列印</button>
+    <a class="btn" href="{{ url_for('dashboard.loan_detail', loan_id=loan.id) }}">返回借出單</a>
+  </div>
+  <main class="print-doc">
+    <h1>器材借用單</h1>
+    <p class="doc-no">{{ loan.doc_no }}</p>
+
+    <table class="data" style="margin:1rem 0">
+      <tbody>
+        <tr><th scope="row" style="width:8rem">借用人</th><td>{{ loan.borrower_display }}</td><th scope="row" style="width:8rem">聯絡方式</th><td>{{ loan.contact or '—' }}</td></tr>
+        <tr><th scope="row">借出日期</th><td>{{ loan.loan_date|ldate }}</td><th scope="row">到期日</th><td><strong>{{ loan.due_date.isoformat() }}</strong></td></tr>
+        <tr><th scope="row">用途</th><td>{{ loan.purpose or '—' }}</td><th scope="row">經手人</th><td>{{ loan.handled_by or '—' }}</td></tr>
+      </tbody>
+    </table>
+
+    <table class="data">
+      <thead><tr><th scope="col" style="width:3rem">#</th><th scope="col">器材</th><th scope="col">分類</th><th scope="col">序號</th><th scope="col">EPC</th></tr></thead>
+      <tbody>
+        {% for item in loan.items if item.state != 'cancelled' %}
+        <tr>
+          <td>{{ loop.index }}</td>
+          <td>{{ item.equipment.name }}</td>
+          <td>{{ item.equipment.category or '—' }}</td>
+          <td>{{ item.equipment.serial_number or '—' }}</td>
+          <td><code class="epc">{{ item.equipment.epc }}</code></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    {% if loan.note %}<p style="margin-top:1rem"><strong>備註:</strong>{{ loan.note }}</p>{% endif %}
+    <p style="margin-top:1rem">借用人確認已收到以上器材,並會於到期日歸還。</p>
+
+    <div class="sign-row">
+      <div class="sign-box">借用人簽署 / 日期</div>
+      <div class="sign-box">經手人簽署 / 日期</div>
+    </div>
+  </main>
+</body>
+</html>

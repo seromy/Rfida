@@ -1,43 +1,106 @@
+{% import "_components.html" as c with context %}
+{%- macro nav_item(endpoints, label, icon_name, href, badge=None, badge_kind='negative') -%}
+  {%- set active = request.endpoint in endpoints -%}
+  <li>
+    <a href="{{ href }}" class="nav-item{{ ' is-active' if active }}"{% if active %} aria-current="page"{% endif %} title="{{ label }}">
+      {{ c.icon(icon_name) }}
+      <span class="nav-label">{{ label }}</span>
+      {% if badge %}<span class="nav-badge nav-badge-{{ badge_kind }}" aria-label="{{ badge }} 項待處理">{{ badge }}</span>{% endif %}
+    </a>
+  </li>
+{%- endmacro -%}
 <!doctype html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>{% block title %}Rfida{% endblock %} · Rfida 後台</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}總覽{% endblock %} · Rfida 器材管理</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230070f2'/%3E%3Cpath d='M10 24V8h7a5 5 0 0 1 0 10h-7m7 0 5 6' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <script src="{{ url_for('static', filename='js/app.js') }}" defer></script>
+  <noscript><style>.tabbar{display:none}[role="tabpanel"][hidden]{display:block !important}</style></noscript>
 </head>
 <body>
-  <nav class="topnav">
-    <div class="topnav-inner">
-      <a class="brand" href="{{ url_for('dashboard.index') }}">
-        <span class="brand-mark">R</span>
-        Rfida
-      </a>
-      <div class="nav-links">
-        <a href="{{ url_for('dashboard.index') }}" class="{{ 'active' if request.endpoint == 'dashboard.index' }}">總覽</a>
-        <a href="{{ url_for('dashboard.equipment_list') }}" class="{{ 'active' if request.endpoint == 'dashboard.equipment_list' }}">器材</a>
-        <a href="{{ url_for('dashboard.job_list') }}" class="{{ 'active' if request.endpoint in ['dashboard.job_list', 'dashboard.job_detail'] }}">Job</a>
-        <a href="{{ url_for('dashboard.movement_list') }}" class="{{ 'active' if request.endpoint == 'dashboard.movement_list' }}">出入紀錄</a>
-        <a href="{{ url_for('dashboard.inventory_session_list') }}" class="{{ 'active' if request.endpoint == 'dashboard.inventory_session_list' }}">盤點紀錄</a>
-        <a href="{{ url_for('dashboard.company_list') }}" class="{{ 'active' if request.endpoint == 'dashboard.company_list' }}">公司</a>
-      </div>
-    </div>
-  </nav>
+  <a class="skip-link" href="#main">跳到主要內容</a>
+  {% include "_icons.html" %}
 
-  <div class="container">
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        <div class="flash-wrap">
+  <header class="shellbar" role="banner">
+    <button type="button" class="shell-btn" id="nav-toggle" aria-label="切換側邊導覽" aria-controls="sidenav" aria-expanded="true">{{ c.icon('menu') }}</button>
+    <a class="shell-brand" href="{{ url_for('dashboard.index') }}">
+      <span class="shell-logo" aria-hidden="true">R</span>
+      <span class="shell-title">Rfida</span>
+      <span class="shell-sub">器材出入管理</span>
+    </a>
+    <form class="shell-search" action="{{ url_for('dashboard.search') }}" method="get" role="search">
+      {{ c.icon('search') }}
+      <input type="search" name="q" placeholder="搜尋器材、EPC 或單號(例如 LN-000012)" aria-label="全域搜尋" autocomplete="off">
+      <kbd aria-hidden="true">/</kbd>
+    </form>
+    <div class="shell-actions">
+      <a class="shell-btn" href="{{ url_for('dashboard.loan_list', status='overdue') }}" aria-label="逾期借出 {{ shell.overdue if shell else 0 }} 項" title="逾期借出">
+        {{ c.icon('clock') }}{% if shell and shell.overdue %}<span class="shell-badge">{{ shell.overdue }}</span>{% endif %}
+      </a>
+      <a class="shell-btn" href="{{ url_for('dashboard.equipment_list', status='missing') }}" aria-label="遺失器材 {{ shell.missing if shell else 0 }} 件" title="遺失器材">
+        {{ c.icon('warning') }}{% if shell and shell.missing %}<span class="shell-badge">{{ shell.missing }}</span>{% endif %}
+      </a>
+    </div>
+  </header>
+
+  <div class="shell-body">
+    <nav class="sidenav" id="sidenav" aria-label="主導覽">
+      <ul class="nav-group">
+        {{ nav_item(['dashboard.index'], '首頁', 'home', url_for('dashboard.index')) }}
+      </ul>
+      <p class="nav-heading">主檔</p>
+      <ul class="nav-group">
+        {{ nav_item(['dashboard.equipment_list', 'dashboard.equipment_detail', 'dashboard.equipment_create', 'dashboard.equipment_edit'], '器材', 'box', url_for('dashboard.equipment_list'), shell.missing if shell and shell.missing else None, 'critical') }}
+        {{ nav_item(['dashboard.company_list', 'dashboard.company_detail', 'dashboard.company_create', 'dashboard.company_edit'], '公司', 'building', url_for('dashboard.company_list')) }}
+      </ul>
+      <p class="nav-heading">作業</p>
+      <ul class="nav-group">
+        {{ nav_item(['dashboard.loan_list', 'dashboard.loan_detail', 'dashboard.loan_create'], '借出單', 'loan', url_for('dashboard.loan_list'), shell.overdue if shell and shell.overdue else None, 'negative') }}
+        {{ nav_item(['dashboard.job_list', 'dashboard.job_detail', 'dashboard.job_create', 'dashboard.job_edit'], 'Job', 'briefcase', url_for('dashboard.job_list')) }}
+        {{ nav_item(['dashboard.movement_list', 'dashboard.movement_detail'], '出入紀錄', 'swap', url_for('dashboard.movement_list')) }}
+        {{ nav_item(['dashboard.inventory_list', 'dashboard.inventory_detail'], '盤點紀錄', 'clipboard', url_for('dashboard.inventory_list')) }}
+      </ul>
+      <p class="nav-heading">報表</p>
+      <ul class="nav-group">
+        {{ nav_item(['dashboard.report_stock'], '庫存概覽', 'chart', url_for('dashboard.report_stock')) }}
+        {{ nav_item(['dashboard.report_changes'], '變更紀錄', 'doc', url_for('dashboard.report_changes')) }}
+      </ul>
+      <p class="nav-foot">時區 {{ app_tz or '' }}</p>
+    </nav>
+    <div class="sidenav-backdrop" data-nav-close hidden></div>
+
+    <main id="main" class="content" tabindex="-1">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="flash-stack" aria-live="polite">
           {% for category, message in messages %}
-            <div class="flash flash-{{ category }}">{{ message }}</div>
+            {% set kind = category if category in ['success', 'error', 'info', 'warning'] else 'info' %}
+            <div class="strip strip-{{ kind }}" role="{{ 'alert' if kind == 'error' else 'status' }}" data-autodismiss="{{ 'no' if kind == 'error' else 'yes' }}">
+              {{ c.icon({'success': 'success', 'error': 'error', 'warning': 'warning', 'info': 'info'}[kind], 'strip-icon') }}
+              <div class="strip-body"><span>{{ message }}</span></div>
+              <button type="button" class="strip-close" aria-label="關閉訊息">{{ c.icon('x') }}</button>
+            </div>
           {% endfor %}
         </div>
-      {% endif %}
-    {% endwith %}
+        {% endif %}
+      {% endwith %}
 
-    {% block content %}{% endblock %}
+      {% block content %}{% endblock %}
+    </main>
   </div>
 
-  <footer class="app-footer">Rfida 器材出入管理系統 — 內部後台</footer>
+  <dialog id="confirm-dialog" class="dialog" aria-labelledby="confirm-title">
+    <form method="dialog">
+      <h2 id="confirm-title" class="dialog-title">請確認</h2>
+      <p id="confirm-message" class="dialog-body"></p>
+      <div class="dialog-actions">
+        <button type="submit" value="cancel" class="btn btn-ghost" id="confirm-cancel">取消</button>
+        <button type="submit" value="ok" class="btn btn-negative" id="confirm-ok">確定</button>
+      </div>
+    </form>
+  </dialog>
 </body>
 </html>

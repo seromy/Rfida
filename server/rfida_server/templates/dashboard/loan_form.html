@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% import "_components.html" as c with context %}
+{% block title %}新增借出單{% endblock %}
+{% block content %}
+{{ c.page_header('新增借出單', '登記借出嘅器材同到期日,儲存後器材會標記為借出中',
+    [('首頁', url_for('dashboard.index')), ('借出單', url_for('dashboard.loan_list')), ('新增', None)]) }}
+
+<div class="page-body">
+  <form method="post" novalidate>
+    {{ c.csrf() }}
+    {{ c.message_strip('error', errors, '未能建立借出單,請修正以下問題:') }}
+
+    <div class="cols-2">
+      <section class="panel">
+        <div class="panel-head"><h2 class="panel-title">借用人</h2></div>
+        <div class="panel-body">
+          <div class="field">
+            <label for="f-company_id">公司(選填)</label>
+            <select id="f-company_id" name="company_id">
+              <option value="">— 個人 / 無公司 —</option>
+              {% for co in companies %}<option value="{{ co.id }}" {{ 'selected' if form.company_id == co.id|string }}>{{ co.name }}</option>{% endfor %}
+            </select>
+          </div>
+          {{ c.field('borrower_name', '借用人姓名', form.borrower_name, placeholder='陳大文', maxlength=200, hint='揀咗公司可以留空;冇公司就必須填寫。') }}
+          {{ c.field('contact', '聯絡方式', form.contact, placeholder='電話或電郵', maxlength=200, hint='留空會自動採用公司資料入面嘅電話 / 電郵。') }}
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head"><h2 class="panel-title">借出資料</h2></div>
+        <div class="panel-body">
+          {{ c.field('due_date', '到期日', form.due_date, type='date', required=True) }}
+          {{ c.field('purpose', '用途', form.purpose, placeholder='例如:婚禮拍攝', maxlength=200) }}
+          {{ c.field('handled_by', '經手人', form.handled_by, placeholder='負責借出嘅同事', maxlength=100) }}
+          <div class="field">
+            <label for="f-note">備註</label>
+            <textarea id="f-note" name="note" maxlength="2000" rows="2">{{ form.note }}</textarea>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <section class="panel panel-spaced" data-picker>
+      <div class="panel-head">
+        <h2 class="panel-title">選擇器材 <span class="req" title="必填">*</span></h2>
+        <span class="picker-count">已揀選 <span data-select-count="equipment">0</span> 件</span>
+      </div>
+      <div class="picker-bar">
+        <div class="grow"><input type="search" data-filter-input placeholder="篩選名稱 / EPC / 序號 / 位置" aria-label="篩選器材"></div>
+        <select data-filter-category aria-label="按分類篩選" class="select-auto">
+          <option value="">全部分類</option>
+          {% for cat in categories %}<option value="{{ cat }}">{{ cat }}</option>{% endfor %}
+        </select>
+        <label class="nowrap"><input type="checkbox" data-filter-available checked> 只顯示可借出</label>
+      </div>
+      <div class="picker table-wrap">
+        <table class="data">
+          <thead>
+            <tr>
+              <th scope="col" class="sel"><input type="checkbox" data-select-all="equipment" aria-label="全選顯示中嘅可借出器材"></th>
+              <th scope="col">器材</th><th scope="col">分類</th><th scope="col">EPC</th><th scope="col">位置</th><th scope="col">狀態</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in rows %}
+            {% set eq = row.eq %}
+            <tr data-epc="{{ eq.epc }}" data-category="{{ eq.category or '未分類' }}" data-available="{{ '0' if row.reason else '1' }}"
+                data-search="{{ (eq.name ~ ' ' ~ eq.epc ~ ' ' ~ eq.category ~ ' ' ~ eq.serial_number ~ ' ' ~ eq.location)|lower }}"
+                class="{{ 'is-disabled' if row.reason }}">
+              <td class="sel"><input type="checkbox" name="equipment_id" value="{{ eq.id }}" data-select="equipment" aria-label="揀選 {{ eq.name }}"
+                    {{ 'disabled' if row.reason }} {{ 'checked' if row.selected and not row.reason }}></td>
+              <td><span class="cell-title">{{ eq.name }}</span>{% if eq.serial_number %}<span class="cell-sub">序號 {{ eq.serial_number }}</span>{% endif %}</td>
+              <td>{{ eq.category or '未分類' }}</td>
+              <td class="nowrap">{{ c.epc_short(eq.epc) }}</td>
+              <td>{{ eq.location or '—' }}</td>
+              <td>{% if row.reason %}{{ c.status('neutral', row.reason) }}{% else %}{{ c.status('positive', '可借出') }}{% endif %}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="6">{{ c.empty('主檔未有器材', '請先登記器材。', 'box') }}</td></tr>
+            {% endfor %}
+            <tr data-filter-empty hidden><td colspan="6" class="text-muted empty-cell">冇符合嘅器材。</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="panel-body panel-body-divided">
+        <div class="field field-tight">
+          <label for="f-epc_paste">或者貼上 EPC 清單(手提機掃描結果,以空格 / 逗號 / 換行分隔)</label>
+          <textarea id="f-epc_paste" name="epc_paste" rows="2" placeholder="E2801160600002042BB8A1C1&#10;E2801160600002042BB8A1C2">{{ pasted }}</textarea>
+        </div>
+        <div class="btn-row">
+          <button type="button" class="btn btn-sm" data-paste-apply>{{ c.icon('scan') }}套用到上面清單</button>
+          <span class="text-muted" data-paste-result role="status"></span>
+        </div>
+      </div>
+    </section>
+
+    <div class="form-footer">
+      <span class="grow">已揀選 <strong data-select-count="equipment">0</strong> 件器材</span>
+      <a class="btn btn-ghost" href="{{ url_for('dashboard.loan_list') }}">取消</a>
+      <button type="submit" class="btn btn-primary">建立借出單</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

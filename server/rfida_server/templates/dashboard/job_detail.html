@@ -1,67 +1,88 @@
 {% extends "base.html" %}
-{% import "_macros.html" as m %}
+{% import "_components.html" as c with context %}
 {% block title %}{{ job.name }}{% endblock %}
 {% block content %}
+{% call c.page_header(job.name, None,
+    [('首頁', url_for('dashboard.index')), ('Job', url_for('dashboard.job_list')), (job.doc_no, None)],
+    c.job_status(job),
+    c.facts([
+      ('Job 編號', job.doc_no),
+      ('日期', job.date|dstr),
+      ('出入紀錄', movements|length),
+      ('應有器材', expected_items|length)
+    ])) %}
+  {% if job.status == 'open' %}
+    {{ c.confirm_button(url_for('dashboard.job_close', job_id=job.id), '結束 Job', '確定結束「' ~ job.name ~ '」?', 'btn btn-primary', '結束 Job') }}
+  {% else %}
+    {{ c.confirm_button(url_for('dashboard.job_reopen', job_id=job.id), '重新開啟', '確定重新開啟「' ~ job.name ~ '」?', 'btn', '重新開啟') }}
+  {% endif %}
+  <a class="btn" href="{{ url_for('dashboard.job_edit', job_id=job.id) }}">{{ c.icon('edit') }}編輯</a>
+  {{ c.confirm_button(url_for('dashboard.job_delete', job_id=job.id), '刪除', '確定刪除 Job「' ~ job.name ~ '」?', 'btn btn-negative', '刪除') }}
+{% endcall %}
 
-<div class="page-header">
-  <div>
-    <div class="eyebrow">Job 詳情</div>
-    <h1>{{ job.name }}</h1>
-    <p>{{ job.date.strftime('%Y-%m-%d') }} · {{ m.job_status_badge(job.status) }}</p>
-  </div>
-  <div>
-    {% if job.status == 'open' %}
-      <form method="post" action="{{ url_for('dashboard.job_close', job_id=job.id) }}">
-        <button class="btn" type="submit">結束呢個 Job</button>
-      </form>
-    {% else %}
-      <form method="post" action="{{ url_for('dashboard.job_reopen', job_id=job.id) }}">
-        <button class="btn btn-ghost" type="submit">重新開啟</button>
-      </form>
-    {% endif %}
-  </div>
+<div class="tabbar" role="tablist" aria-label="Job 分頁" data-tabs>
+  <button type="button" role="tab" class="tab" id="tab-expected" aria-controls="panel-expected" aria-selected="true">應有清單<span class="tab-count">{{ expected_items|length }}</span></button>
+  <button type="button" role="tab" class="tab" id="tab-movements" aria-controls="panel-movements" aria-selected="false">出入紀錄<span class="tab-count">{{ movements|length }}</span></button>
+  <button type="button" role="tab" class="tab" id="tab-changes" aria-controls="panel-changes" aria-selected="false">變更紀錄<span class="tab-count">{{ audit|length }}</span></button>
 </div>
 
-<div class="grid-2">
-  <div class="card">
-    <h2>出入紀錄</h2>
-    {% if movements %}
-      <table>
-        <thead><tr><th>時間</th><th>公司</th><th>方向</th><th>EPC</th></tr></thead>
-        <tbody>
-          {% for mv in movements %}
-          <tr>
-            <td>{{ mv.created_at.strftime('%m/%d %H:%M') }}</td>
-            <td>{{ mv.company.name if mv.company else '—' }}</td>
-            <td>{{ m.direction_badge(mv.direction) }}</td>
-            <td>{{ m.epc_list(mv.epcs) }}</td>
-          </tr>
-          {% if mv.missing_epcs %}
-          <tr>
-            <td></td>
-            <td colspan="3"><span class="badge badge-missing">缺件</span> {{ m.epc_list(mv.missing_epcs) }}</td>
-          </tr>
-          {% endif %}
-          {% endfor %}
-        </tbody>
-      </table>
-    {% else %}
-      <div class="empty-state">呢個 Job 未有出入紀錄</div>
-    {% endif %}
+<div class="page-body">
+  <div role="tabpanel" id="panel-expected" aria-labelledby="tab-expected">
+    <section class="panel">
+      <div class="panel-head">
+        <h2 class="panel-title">出 Job 時帶走嘅器材 <span class="panel-count">({{ expected_items|length }})</span></h2>
+        {% if out_movement %}<span class="text-muted">依據 <a href="{{ url_for('dashboard.movement_detail', movement_id=out_movement.id) }}">{{ out_movement.doc_no }}</a></span>{% endif %}
+      </div>
+      {% if expected_items %}
+      <div class="table-wrap">
+        <table class="data">
+          <thead><tr><th scope="col">器材</th><th scope="col">分類</th><th scope="col">EPC</th><th scope="col">現況</th></tr></thead>
+          <tbody>
+            {% for eq in expected_items %}
+            <tr data-href="{{ url_for('dashboard.equipment_detail', equipment_id=eq.id) }}">
+              <td><a class="row-link" href="{{ url_for('dashboard.equipment_detail', equipment_id=eq.id) }}">{{ eq.name }}</a></td>
+              <td>{{ eq.category or '—' }}</td>
+              <td class="nowrap">{{ c.epc_short(eq.epc) }}</td>
+              <td>{{ c.equipment_status(eq) }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}{{ c.empty('未有「出 Job」紀錄', '用手提機做出發前登記後,應有清單會顯示喺度。', 'box') }}{% endif %}
+    </section>
   </div>
 
-  <div class="card">
-    <h3>出Job時帶走嘅器材(應有清單)</h3>
-    {% if expected_items %}
-      <ul class="list-plain">
-        {% for eq in expected_items %}
-          <li>{{ eq.name }} {{ m.equipment_status_badge(eq.status) }}</li>
-        {% endfor %}
-      </ul>
-    {% else %}
-      <p class="text-muted">未有「出Job」紀錄</p>
-    {% endif %}
+  <div role="tabpanel" id="panel-movements" aria-labelledby="tab-movements" hidden>
+    <section class="panel">
+      <div class="panel-head"><h2 class="panel-title">出入紀錄 <span class="panel-count">({{ movements|length }})</span></h2></div>
+      {% if movements %}
+      <div class="table-wrap">
+        <table class="data">
+          <thead><tr><th scope="col">單號</th><th scope="col">時間</th><th scope="col">公司</th><th scope="col">方向</th><th scope="col" class="num">數量</th><th scope="col">缺件</th></tr></thead>
+          <tbody>
+            {% for mv in movements %}
+            <tr data-href="{{ url_for('dashboard.movement_detail', movement_id=mv.id) }}">
+              <td class="nowrap"><a class="row-link" href="{{ url_for('dashboard.movement_detail', movement_id=mv.id) }}">{{ mv.doc_no }}</a></td>
+              <td class="nowrap tnum">{{ mv.created_at|ldt }}</td>
+              <td>{{ mv.company.name if mv.company else '—' }}</td>
+              <td>{{ c.direction_status(mv.direction) }}</td>
+              <td class="num">{{ (mv.epcs or [])|length }}</td>
+              <td>{% if mv.missing_epcs %}{{ c.status('negative', (mv.missing_epcs|length) ~ ' 件') }}{% else %}—{% endif %}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}{{ c.empty('呢個 Job 未有出入紀錄', None, 'swap') }}{% endif %}
+    </section>
+  </div>
+
+  <div role="tabpanel" id="panel-changes" aria-labelledby="tab-changes" hidden>
+    <section class="panel">
+      <div class="panel-head"><h2 class="panel-title">變更紀錄 <span class="panel-count">({{ audit|length }})</span></h2></div>
+      {{ c.audit_table(audit) }}
+    </section>
   </div>
 </div>
-
 {% endblock %}

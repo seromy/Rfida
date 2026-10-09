@@ -1,56 +1,63 @@
 {% extends "base.html" %}
-{% import "_macros.html" as m %}
+{% import "_components.html" as c with context %}
 {% block title %}Job{% endblock %}
 {% block content %}
+{% call c.page_header('Job', '外出拍攝工作:出Job帶走嘅器材同歸還紀錄', [('首頁', url_for('dashboard.index')), ('Job', None)]) %}
+  <a class="btn btn-primary" href="{{ url_for('dashboard.job_create') }}">{{ c.icon('plus') }}建立 Job</a>
+{% endcall %}
 
-<div class="page-header">
-  <div>
-    <div class="eyebrow">工作排程</div>
-    <h1>Job 清單</h1>
-  </div>
-</div>
-
-<div class="card">
-  <h3>建立新 Job</h3>
-  <form method="post" action="{{ url_for('dashboard.job_create') }}" class="form-inline">
-    <div class="field">
-      <label for="name">Job 名稱</label>
-      <input type="text" id="name" name="name" placeholder="2026-09-12 婚禮攝影" required>
+<div class="page-body">
+  <form class="filterbar" method="get" role="search" aria-label="Job 篩選">
+    <div class="filter-grid">
+      <div class="field field-wide">
+        <label for="f-q">搜尋</label>
+        <input type="search" id="f-q" name="q" value="{{ q }}" placeholder="Job 名稱">
+      </div>
+      <input type="hidden" name="status" value="{{ status }}">
+      <div class="filter-actions">
+        <button class="btn btn-primary" type="submit">{{ c.icon('search') }}查詢</button>
+        <a class="btn btn-ghost" href="{{ url_for('dashboard.job_list') }}">{{ c.icon('reset') }}重設</a>
+      </div>
     </div>
-    <div class="field">
-      <label for="date">日期</label>
-      <input type="date" id="date" name="date">
-    </div>
-    <button class="btn" type="submit">建立</button>
   </form>
-</div>
 
-<div class="card card-flush">
-  <div style="padding: 20px 20px 0;">
-    <div class="pill-nav">
-      <a href="{{ url_for('dashboard.job_list') }}" class="{{ 'active' if not status }}">全部</a>
-      <a href="{{ url_for('dashboard.job_list', status='open') }}" class="{{ 'active' if status == 'open' }}">進行中</a>
-      <a href="{{ url_for('dashboard.job_list', status='closed') }}" class="{{ 'active' if status == 'closed' }}">已結束</a>
+  <nav class="quick-filters" aria-label="按狀態篩選">
+    {% for key, label in [('', '全部'), ('open', '進行中'), ('closed', '已結束')] %}
+      <a class="qf" href="{{ url_args(status=key, page=None) }}" {% if status == key %}aria-current="true"{% endif %}>{{ label }}<span class="qf-count">{{ counts['all' if key == '' else key] }}</span></a>
+    {% endfor %}
+  </nav>
+
+  <section class="panel" aria-labelledby="list-title">
+    <div class="panel-head"><h2 class="panel-title" id="list-title">Job 清單 <span class="panel-count">({{ page.total }})</span></h2></div>
+    {% if items %}
+    <div class="table-wrap">
+      <table class="data">
+        <thead>
+          <tr>
+            {{ c.sort_th('id', '編號', sort, dir) }}
+            {{ c.sort_th('name', 'Job', sort, dir) }}
+            {{ c.sort_th('date', '日期', sort, dir) }}
+            {{ c.sort_th('status', '狀態', sort, dir) }}
+            <th scope="col" class="num">出入紀錄</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for job in items %}
+          <tr data-href="{{ url_for('dashboard.job_detail', job_id=job.id) }}">
+            <td class="nowrap">{{ job.doc_no }}</td>
+            <td><a class="row-link" href="{{ url_for('dashboard.job_detail', job_id=job.id) }}">{{ job.name }}</a></td>
+            <td class="nowrap tnum">{{ job.date|dstr }}</td>
+            <td>{{ c.job_status(job) }}</td>
+            <td class="num">{{ movement_counts.get(job.id, 0) }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
-  </div>
-
-  {% if items %}
-  <table>
-    <thead><tr><th>Job</th><th>日期</th><th>狀態</th><th></th></tr></thead>
-    <tbody>
-      {% for job in items %}
-      <tr>
-        <td><a href="{{ url_for('dashboard.job_detail', job_id=job.id) }}">{{ job.name }}</a></td>
-        <td>{{ job.date.strftime('%Y-%m-%d') }}</td>
-        <td>{{ m.job_status_badge(job.status) }}</td>
-        <td style="text-align:right;"><a class="btn btn-ghost btn-sm" href="{{ url_for('dashboard.job_detail', job_id=job.id) }}">詳情</a></td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-  {% else %}
-    <div class="empty-state">未有 Job 紀錄</div>
-  {% endif %}
+    {{ c.pagination(page) }}
+    {% else %}
+      {% call c.empty('未有符合嘅 Job', None, 'briefcase') %}<a class="btn btn-primary" href="{{ url_for('dashboard.job_create') }}">建立 Job</a>{% endcall %}
+    {% endif %}
+  </section>
 </div>
-
 {% endblock %}
